@@ -7,6 +7,7 @@ package hep
 import (
 	"encoding/binary"
 	"errors"
+	"net"
 )
 
 /*************************************
@@ -81,72 +82,76 @@ func init() {
 
 // Define Struct for storing full HEP message
 type HepMsg struct {
-	IpProtocolFamily      int
-	IpProtocolId          int
+	IpProtocolFamily      byte
+	IpProtocolId          byte
 	Ip4SourceAddress      string
 	Ip4DestinationAddress string
 	Ip6SourceAddress      string
 	Ip6DestinationAddress string
-	SourcePort            int
-	DestinationPort       int
-	Timestamp             int32
-	TimestampMicro        int32
-	ProtocolType          int
-	CaptureAgentId        int32
-	KeepAliveTimer        int16
+	SourcePort            uint16
+	DestinationPort       uint16
+	Timestamp             uint32
+	TimestampMicro        uint32
+	ProtocolType          byte
+	CaptureAgentId        uint32
+	KeepAliveTimer        uint16
 	AuthenticateKey       string
 	Body                  string
 }
 
-func (hepMsg *HepMsg) Parse(udpPacket []byte) err {
-	if binary.BigEndian.Uint32(buf[:3]) != HEP_ID {
+func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
+	hepIdSlice := udpPacket[:4]
+	hepIdInt := binary.BigEndian.Uint32(hepIdSlice)
+	if hepIdInt != HEP_ID {
 		err := errors.New("Not a valid HEP3 packet - HEP3 ID is incorrect")
 		return err
 	}
 
-	length := binary.BigEndian.Uint32(buf[4:5])
-	currentByte := 6
+	length := binary.BigEndian.Uint16(udpPacket[4:6])
+	currentByte := uint16(6)
+
 	for currentByte < length {
+		hepChunk := udpPacket[currentByte:]
+		//chunkVendorId := binary.BigEndian.Uint16(hepChunk[:2])
+		chunkType := binary.BigEndian.Uint16(hepChunk[2:4])
+		chunkLength := binary.BigEndian.Uint16(hepChunk[4:6])
+		chunkBody := hepChunk[6:chunkLength]
 
+		switch chunkType {
+		case IP_PROTOCOL_FAMILY:
+			hepMsg.IpProtocolFamily = chunkBody[0]
+		case IP_PROTOCOL_ID:
+			hepMsg.IpProtocolId = chunkBody[0]
+		case IP4_SOURCE_ADDRESS:
+			hepMsg.Ip4SourceAddress = net.IP(chunkBody).String()
+		case IP4_DESTINATION_ADDRESS:
+			hepMsg.Ip4DestinationAddress = net.IP(chunkBody).String()
+		case IP6_SOURCE_ADDRESS:
+			hepMsg.Ip6SourceAddress = net.IP(chunkBody).String()
+		case IP6_DESTINATION_ADDRESS:
+			hepMsg.Ip4DestinationAddress = net.IP(chunkBody).String()
+		case SOURCE_PORT:
+			hepMsg.SourcePort = binary.BigEndian.Uint16(chunkBody)
+		case DESTINATION_PORT:
+			hepMsg.DestinationPort = binary.BigEndian.Uint16(chunkBody)
+		case TIMESTAMP:
+			hepMsg.Timestamp = binary.BigEndian.Uint32(chunkBody)
+		case TIMESTAMP_MICRO:
+			hepMsg.TimestampMicro = binary.BigEndian.Uint32(chunkBody)
+		case PROTOCOL_TYPE:
+			hepMsg.ProtocolType = chunkBody[0]
+		case CAPTURE_AGENT_ID:
+			hepMsg.CaptureAgentId = binary.BigEndian.Uint32(chunkBody)
+		case KEEP_ALIVE_TIMER:
+			hepMsg.KeepAliveTimer = binary.BigEndian.Uint16(chunkBody)
+		case AUTHENTICATE_KEY:
+			hepMsg.AuthenticateKey = string(chunkBody)
+		case PACKET_PAYLOAD:
+			hepMsg.Body += string(chunkBody)
+		case COMPRESSED_PAYLOAD:
+		case INTERNAL_C:
+		}
+		currentByte += chunkLength
 	}
-
-}
-
-func (hepMsg *HepMsg) parseChunk(hepChunk []byte) (length, err) {
-	chunkVendorId := binary.BigEndian.Uint16(hepChunk[:1])
-	chunkType := binary.BigEndian.Uint16(hepChunk[2:3])
-	chunkLength := binary.BigEndian.Uint32(hepChunk[4:5])
-	chunkBody := hepChunk[6 : chunkLength-1]
-
-	switch chunkType {
-	case IP_PROTOCOL_FAMILY:
-		hepMsg.IpProtocolFamily = binary.BigEndian.Uint16(chunkBody)
-	case IP_PROTOCOL_ID:
-		hepMsg.IpProtocolId = binary.BigEndian.Uint16(chunkBody)
-	case IP4_SOURCE_ADDRESS:
-		hepMsg.Ip4SourceAddress = binary.BigEndian.String(chunkBody)
-	case IP4_DESTINATION_ADDRESS:
-		hepMsg.Ip4DestinationAddress = binary.BigEndian.String(chunkBody)
-	case IP6_SOURCE_ADDRESS:
-		hepMsg.Ip6SourceAddress = binary.BigEndian.String(chunkBody)
-	case IP6_DESTINATION_ADDRESS:
-		hepMsg.Ip4DestinationAddress = binary.BigEndian.String(chunkBody)
-	case SOURCE_PORT:
-		hepMsg.SourcePort = binary.BigEndian.Uint16(chunkBody)
-	case DESTINATION_PORT:
-		hepMsg.DestinationPort = binary.BigEndian.Uint16(chunkBody)
-	case TIMESTAMP:
-		hepMsg.Timestamp = binary.BigEndian.Uint36(chunkBody)
-	case TIMESTAMP_MICRO:
-		hepMsg.TimestampMicro = binary.BigEndian.Uint36(chunkBody)
-	case PROTOCOL_TYPE:
-		hepMsg.ProtocolType = binary.BigEndian.Uint16(chunkBody)
-	case CAPTURE_AGENT_ID:
-	case KEEP_ALIVE_TIMER:
-	case AUTHENTICATE_KEY:
-	case PACKET_PAYLOAD:
-	case COMPRESSED_PAYLOAD:
-	case INTERNAL_C:
-	}
-
+	return nil
 }
