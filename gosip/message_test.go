@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestParse(t *testing.T) {
+func TestBasicParse(t *testing.T) {
 	t.Log("Test basic parse")
 	msg := &SipMsg{}
 

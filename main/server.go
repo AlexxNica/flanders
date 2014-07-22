@@ -1,17 +1,16 @@
 package main
 
 import (
-	"encoding/binary"
-	"fmt"
+	"hep"
 	"net"
 )
 
 const hepId = 0x48455033
 
-func UDPServer() {
+func UDPServer(ip string, port int) {
 	addr := net.UDPAddr{
-		Port: 9060,
-		IP:   net.ParseIP("127.0.0.1"),
+		Port: port,
+		IP:   net.ParseIP(ip),
 	}
 	conn, err := net.ListenUDP("udp", &addr)
 	defer conn.Close()
@@ -20,15 +19,17 @@ func UDPServer() {
 	}
 
 	for {
-		buf := make([]byte, 512)
+		packet := make([]byte, 2048)
+		hepMsg := &hep.HepMsg{}
 
-		n, remote_addr, err := conn.ReadFromUDP(buf)
-		if binary.BigEndian.Uint32(buf[:3]) != hepId {
+		_, _, err := conn.ReadFromUDP(packet)
+
+		if err != nil {
 			continue
 		}
 
-		length := binary.BigEndian.Uint32(buf[4:5])
+		hepMsg.Parse(packet)
 
-		fmt.Println("from", remote_addr, "got message:", string(buf), " Error: ", err, n)
+		// Do something with the parsed message
 	}
 }
