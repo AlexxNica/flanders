@@ -1,3 +1,5 @@
 # Flanders
 
-A sip-capture server written in Golang. Inspired by Homer (which is an awesome project).
+A sip-capture server written in Golang.
+
+![Flanders](assets/flanders.png)
