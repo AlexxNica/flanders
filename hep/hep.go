@@ -15,7 +15,7 @@ import (
 *************************************/
 
 // HEP ID
-const HEP_ID = 0x48455033
+const HEP_ID3 = 0x48455033
 
 // Generic Chunk Types
 const (
@@ -102,7 +102,7 @@ type HepMsg struct {
 func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
 	hepIdSlice := udpPacket[:4]
 	hepIdInt := binary.BigEndian.Uint32(hepIdSlice)
-	if hepIdInt != HEP_ID {
+	if hepIdInt != HEP_ID3 {
 		err := errors.New("Not a valid HEP3 packet - HEP3 ID is incorrect")
 		return err
 	}
