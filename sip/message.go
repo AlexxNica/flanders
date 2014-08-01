@@ -1,4 +1,4 @@
-package gosip
+package sip
 
 import (
 	"strconv"
@@ -131,7 +131,7 @@ type SipMsg struct {
 	Error              error
 	Msg                string
 	Body               string
-	StartLine          string
+	StartLine          *StartLine
 	Accept             string
 	AlertInfo          string
 	Allow              []string
@@ -174,8 +174,14 @@ type SipMsg struct {
 	OtherHeaders       []string
 }
 
+func NewSipMsg(packet []byte) (*SipMsg, error) {
+	newSipMsg := &SipMsg{}
+	newSipMsg.Parse(string(packet))
+	return newSipMsg, nil
+}
+
 // Parse takes a SIP message and parses it into the SipMsg struct
-func (s *SipMsg) Parse(m string) {
+func (s *SipMsg) Parse(m string) error {
 	// Store the original message into the message property
 	s.Msg = m
 
@@ -184,10 +190,10 @@ func (s *SipMsg) Parse(m string) {
 
 	for i := range headers {
 		if i == 0 {
-			s.StartLine = headers[i]
+			s.StartLine, _ = parseStartLine(headers[i])
 		} else {
 			if headers[i] == "\n" || headers[i] == "" {
-				return
+				return nil
 			}
 			headerKeyValue := strings.SplitN(headers[i], ":", 2)
 			headerKey := strings.TrimSpace(strings.ToLower(headerKeyValue[0]))
@@ -269,4 +275,5 @@ func (s *SipMsg) Parse(m string) {
 			}
 		}
 	}
+	return nil
 }

@@ -1,4 +1,4 @@
-package gosip
+package sip
 
 import (
 	"testing"

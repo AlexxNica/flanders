@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"hep"
 	"net"
+	"sip"
 )
 
 func main() {
@@ -24,7 +24,6 @@ func UDPServer(ip string, port int) {
 
 	for {
 		packet := make([]byte, 4096)
-		hepMsg := &hep.HepMsg{}
 
 		_, _, err := conn.ReadFromUDP(packet)
 
@@ -35,12 +34,13 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 
-		hepErr := hepMsg.Parse(packet)
-		if hepErr != nil {
-			fmt.Println(hepErr)
+		sipMsg, sipErr := sip.NewSipMsg(packet)
+
+		if sipErr != nil {
+			fmt.Println(sipErr)
 			continue
 		}
-		fmt.Printf("%+v\n", hepMsg)
+		fmt.Printf("%+v\n", sipMsg)
 
 		// Do something with the parsed message
 	}
