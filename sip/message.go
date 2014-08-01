@@ -1,6 +1,7 @@
 package sip
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -128,9 +129,7 @@ const (
 
 type SipMsg struct {
 	State              string
-	Error              error
 	Msg                string
-	Body               string
 	StartLine          *StartLine
 	Accept             string
 	AlertInfo          string
@@ -176,7 +175,10 @@ type SipMsg struct {
 
 func NewSipMsg(packet []byte) (*SipMsg, error) {
 	newSipMsg := &SipMsg{}
-	newSipMsg.Parse(string(packet))
+	err := newSipMsg.Parse(string(packet))
+	if err != nil {
+		return nil, err
+	}
 	return newSipMsg, nil
 }
 
@@ -189,13 +191,21 @@ func (s *SipMsg) Parse(m string) error {
 	headers := strings.Split(m, "\n")
 
 	for i := range headers {
+		var err error
 		if i == 0 {
-			s.StartLine, _ = parseStartLine(headers[i])
+			s.StartLine, err = parseStartLine(headers[i])
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
 		} else {
 			if headers[i] == "\n" || headers[i] == "" {
 				return nil
 			}
 			headerKeyValue := strings.SplitN(headers[i], ":", 2)
+			if len(headerKeyValue) < 2 {
+				continue
+			}
 			headerKey := strings.TrimSpace(strings.ToLower(headerKeyValue[0]))
 			headerValue := strings.TrimSpace(headerKeyValue[1])
 
