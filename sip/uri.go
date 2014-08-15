@@ -51,5 +51,7 @@ func (u *URI) Parse(uriString) error {
     else {
         return errors.New("parseURI err: Bad SIP URI. Must start with 'sip:', 'tel:', 'sips:'.")
     }
+
+    
 	
 }
