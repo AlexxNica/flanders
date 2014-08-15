@@ -24,7 +24,7 @@ P-Asserted-Identity: ". ." <sip:9725915920@10.25.2.32;user=phone>
 Content-Length: 0
 
 `)
-	if msg.StartLine != "SIP/2.0 180 Ringing" {
+	if msg.StartLine.Body != "SIP/2.0 180 Ringing" {
 		t.Fatalf("SipMsg.Parse: Expected first line of sip message to be different: %s", msg.StartLine)
 	}
 
