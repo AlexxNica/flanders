@@ -33,25 +33,20 @@ func parseURI(uri string) (*URI, error) {
 	return newUri, nil
 }
 
-func (u *URI) Parse(uriString) error {
+func (u *URI) Parse(uriString string) error {
 	u.Body = uriString
 	sLen := len(uriString)
 	if uriString[0:4] == "sip:" {
 		uriString = uriString[4:]
 		u.Scheme = SIP_SCHEME
-	}	
-    else if u.Raw[0:4] == "tel:" {
+	} else if uriString[0:4] == "tel:" {
 		uriString = uriString[4:]
 		u.Scheme = TEL_SCHEME
-	}
-	else if sLen > 5 && u.Raw[0:5] == "sips:" {
-        uriString = uriString[5:]
+	} else if sLen > 5 && uriString[0:5] == "sips:" {
+		uriString = uriString[5:]
 		u.Scheme = SIPS_SCHEME
+	} else {
+		return errors.New("parseURI err: Bad SIP URI. Must start with 'sip:', 'tel:', 'sips:'.")
 	}
-    else {
-        return errors.New("parseURI err: Bad SIP URI. Must start with 'sip:', 'tel:', 'sips:'.")
-    }
-
-    
-	
+	return nil
 }

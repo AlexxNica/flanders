@@ -1,9 +1,9 @@
 package main
 
 import (
+	"../sip"
 	"fmt"
 	"net"
-	"sip"
 )
 
 func main() {
