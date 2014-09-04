@@ -2,11 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/spacemonkeygo/spacelog"
+	// "github.com/spacemonkeygo/spacelog/setup"
 	"lab.getweave.com/weave/flanders/sip"
 	"net"
 )
 
 func main() {
+	logger := spacelog.GetLogger()
+	logger.Debug("Testing logger")
 	UDPServer("127.0.0.1", 9060)
 }
 
