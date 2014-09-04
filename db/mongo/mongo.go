@@ -4,7 +4,7 @@ import (
 	//"fmt"
 	"gopkg.in/mgo.v2"
 	//"gopkg.in/mgo.v2/bson"
-	"sip"
+	"lab.getweave.com/weave/flanders/sip"
 )
 
 const (
