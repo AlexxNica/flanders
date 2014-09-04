@@ -1,8 +1,8 @@
 package main
 
 import (
-	"../sip"
 	"fmt"
+	"lab.getweave.com/weave/flanders/sip"
 	"net"
 )
 
