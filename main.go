@@ -29,9 +29,13 @@ func UDPServer(ip string, port int) {
 	for {
 		packet := make([]byte, 4096)
 
-		_, _, err := conn.ReadFromUDP(packet)
+		length, _, err := conn.ReadFromUDP(packet)
 
-		fmt.Printf("Packet: %X\n", packet)
+		truncatedPacket := packet[:length]
+		sipString := string(packet[:length])
+
+		fmt.Printf("\nPacket: %X\n", truncatedPacket)
+		fmt.Printf("\nPacket: %s\n", sipString)
 
 		if err != nil {
 			fmt.Println(err)
@@ -41,11 +45,12 @@ func UDPServer(ip string, port int) {
 		sipMsg, sipErr := sip.NewSipMsg(packet)
 
 		if sipErr != nil {
+			fmt.Println("ERROR PARSING SIP MESSAGE.................")
 			fmt.Println(sipErr)
 			continue
 		}
 		fmt.Printf("%+v\n", sipMsg)
-
+		fmt.Printf("%+v\n", sipMsg.StartLine)
 		// Do something with the parsed message
 	}
 }
