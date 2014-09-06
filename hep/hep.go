@@ -15,7 +15,10 @@ import (
 *************************************/
 
 // HEP ID
-const HEP_ID3 = 0x48455033
+const (
+	HEP_ID1 = 0x01100211
+	HEP_ID3 = 0x48455033
+)
 
 // Generic Chunk Types
 const (
@@ -99,14 +102,43 @@ type HepMsg struct {
 	Body                  string
 }
 
+func NewHepMsg(packet []byte) (*HepMsg, error) {
+	newHepMsg := &HepMsg{}
+	err := newHepMsg.Parse(packet)
+	if err != nil {
+		return nil, err
+	}
+	return newHepMsg, nil
+}
+
 func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
 	hepIdSlice := udpPacket[:4]
 	hepIdInt := binary.BigEndian.Uint32(hepIdSlice)
-	if hepIdInt != HEP_ID3 {
-		err := errors.New("Not a valid HEP3 packet - HEP3 ID is incorrect")
+
+	switch hepIdInt {
+	case HEP_ID1:
+		return hepMsg.ParseHep1(udpPacket)
+	case HEP_ID3:
+		return hepMsg.ParseHep3(udpPacket)
+	default:
+		err := errors.New("Not a valid HEP packet - HEP ID does not match spec")
 		return err
 	}
+}
+func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
+	if len(udpPacket) < 20 {
+		return errors.New("Found HEP ID for HEP v1, but length of packet is too short to be HEP1")
+	}
+	hepMsg.SourcePort = binary.BigEndian.Uint16(udpPacket[4:6])
+	hepMsg.DestinationPort = binary.BigEndian.Uint16(udpPacket[6:8])
+	hepMsg.Ip4SourceAddress = net.IP(udpPacket[8:12]).String()
+	hepMsg.Ip4DestinationAddress = net.IP(udpPacket[12:16]).String()
+	hepMsg.Body = string(udpPacket[16:])
 
+	return nil
+}
+
+func (hepMsg *HepMsg) ParseHep3(udpPacket []byte) error {
 	length := binary.BigEndian.Uint16(udpPacket[4:6])
 	currentByte := uint16(6)
 
@@ -150,6 +182,7 @@ func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
 			hepMsg.Body += string(chunkBody)
 		case COMPRESSED_PAYLOAD:
 		case INTERNAL_C:
+		default:
 		}
 		currentByte += chunkLength
 	}

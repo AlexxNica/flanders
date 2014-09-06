@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/spacemonkeygo/spacelog"
 	// "github.com/spacemonkeygo/spacelog/setup"
-	"lab.getweave.com/weave/flanders/sip"
+	"lab.getweave.com/weave/flanders/hep"
 	"net"
 )
 
@@ -31,26 +31,25 @@ func UDPServer(ip string, port int) {
 
 		length, _, err := conn.ReadFromUDP(packet)
 
-		truncatedPacket := packet[:length]
-		sipString := string(packet[:length])
+		packet = packet[:length]
+		// hepString := string(packet[:length])
 
-		fmt.Printf("\nPacket: %X\n", truncatedPacket)
-		fmt.Printf("\nPacket: %s\n", sipString)
+		// fmt.Printf("\nPacket: %X\n", truncatedPacket)
+		// fmt.Printf("\nPacket: %s\n", hepString)
 
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 
-		sipMsg, sipErr := sip.NewSipMsg(packet)
+		hepMsg, hepErr := hep.NewHepMsg(packet)
 
-		if sipErr != nil {
-			fmt.Println("ERROR PARSING SIP MESSAGE.................")
-			fmt.Println(sipErr)
+		if hepErr != nil {
+			fmt.Println("ERROR PARSING HEP MESSAGE.................")
+			fmt.Println(hepErr)
 			continue
 		}
-		fmt.Printf("%+v\n", sipMsg)
-		fmt.Printf("%+v\n", sipMsg.StartLine)
+		fmt.Printf("%+v\n", hepMsg)
 		// Do something with the parsed message
 	}
 }
