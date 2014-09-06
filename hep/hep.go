@@ -7,6 +7,7 @@ package hep
 import (
 	"encoding/binary"
 	"errors"
+	"lab.getweave.com/weave/flanders/sip"
 	"net"
 )
 
@@ -100,6 +101,7 @@ type HepMsg struct {
 	KeepAliveTimer        uint16
 	AuthenticateKey       string
 	Body                  string
+	SipMsg                *sip.SipMsg
 }
 
 func NewHepMsg(packet []byte) (*HepMsg, error) {
@@ -126,14 +128,22 @@ func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
 	}
 }
 func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
+	var err error
 	if len(udpPacket) < 20 {
 		return errors.New("Found HEP ID for HEP v1, but length of packet is too short to be HEP1")
 	}
+	packetLength := len(udpPacket)
 	hepMsg.SourcePort = binary.BigEndian.Uint16(udpPacket[4:6])
 	hepMsg.DestinationPort = binary.BigEndian.Uint16(udpPacket[6:8])
 	hepMsg.Ip4SourceAddress = net.IP(udpPacket[8:12]).String()
 	hepMsg.Ip4DestinationAddress = net.IP(udpPacket[12:16]).String()
 	hepMsg.Body = string(udpPacket[16:])
+	if len(udpPacket[16:packetLength-4]) > 1 {
+		hepMsg.SipMsg, err = sip.NewSipMsg(udpPacket[16 : packetLength-4])
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
