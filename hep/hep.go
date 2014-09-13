@@ -143,6 +143,8 @@ func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
 		if err != nil {
 			return err
 		}
+	} else {
+
 	}
 
 	return nil
