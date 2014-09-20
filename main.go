@@ -51,6 +51,6 @@ func UDPServer(ip string, port int) {
 		}
 		fmt.Printf("%#v\n", hepMsg)
 		fmt.Printf("%+v\n", hepMsg.SipMsg)
-		// Do something with the parsed message
+		// Do something with the parsed message test
 	}
 }

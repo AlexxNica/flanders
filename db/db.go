@@ -1,8 +1,8 @@
 package db
 
-import (
-	"db/mongo"
-)
+// import (
+// 	"lab.getweave.com/weave/flanders/db/mongo"
+// )
 
 type DbObject struct {
 	Timestamp       uint32
