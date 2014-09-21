@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/spacemonkeygo/spacelog"
-	// "github.com/spacemonkeygo/spacelog/setup"
+	"lab.getweave.com/weave/flanders/db"
 	"lab.getweave.com/weave/flanders/hep"
+	"log"
 	"net"
 )
 
@@ -51,6 +52,19 @@ func UDPServer(ip string, port int) {
 		}
 		fmt.Printf("%#v\n", hepMsg)
 		fmt.Printf("%+v\n", hepMsg.SipMsg)
-		// Do something with the parsed message test
+
+		// Store HEP message in database
+		dbObject := db.NewDbObject()
+		dbObject.SourceIp = hepMsg.Ip4SourceAddress
+		dbObject.SourcePort = hepMsg.SourcePort
+		dbObject.DestinationIp = hepMsg.Ip4DestinationAddress
+		dbObject.DestinationPort = hepMsg.DestinationPort
+		dbObject.Msg = hepMsg.SipMsg.Msg
+
+		err = dbObject.Save()
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
 	}
 }

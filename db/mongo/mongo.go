@@ -4,7 +4,6 @@ import (
 	//"fmt"
 	"gopkg.in/mgo.v2"
 	//"gopkg.in/mgo.v2/bson"
-	"lab.getweave.com/weave/flanders/sip"
 )
 
 const (
@@ -26,8 +25,8 @@ func Connect(connectString string) {
 
 }
 
-func Insert(sipMsg *sip.SipMsg) {
-	collection := connection.DB(DB_NAME).C("msg")
-
-	collection.Insert(sipMsg)
+func Insert(dbObject interface{}) error {
+	collection := connection.DB(DB_NAME).C("message")
+	err := collection.Insert(dbObject)
+	return err
 }

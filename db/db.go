@@ -1,8 +1,8 @@
 package db
 
-// import (
-// 	"lab.getweave.com/weave/flanders/db/mongo"
-// )
+import (
+	"lab.getweave.com/weave/flanders/db/mongo"
+)
 
 type DbObject struct {
 	Timestamp       uint32
@@ -45,4 +45,17 @@ type DbObject struct {
 	Type            uint
 	Node            string
 	Msg             string
+}
+
+func NewDbObject() *DbObject {
+	newDbObject := &DbObject{}
+	return newDbObject
+}
+
+func (d *DbObject) Save() error {
+	err := mongo.Insert(d)
+	if err != nil {
+		return err
+	}
+	return nil
 }
