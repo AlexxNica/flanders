@@ -2,4 +2,4 @@
 
 A sip-capture server written in Golang.
 
-![Flanders](assets/flanders.png)
+![Flanders](web/app/images/flanders.png)
