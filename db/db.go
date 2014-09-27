@@ -1,8 +1,10 @@
 package db
 
 import (
-	"lab.getweave.com/weave/flanders/db/mongo"
+	"fmt"
 )
+
+var db DbHandler
 
 type DbObject struct {
 	Timestamp       uint32
@@ -47,13 +49,30 @@ type DbObject struct {
 	Msg             string
 }
 
+type SearchMap map[string]interface{}
+type OptionsMap map[string]interface{}
+
+type DbHandler interface {
+	Connect(connectString string) error
+	Insert(dbObject *DbObject) error
+	Find(params SearchMap, options OptionsMap, result []DbObject) error
+}
+
+func RegisterHandler(dbHandler DbHandler) {
+	db = dbHandler
+	err := db.Connect("localhost")
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func NewDbObject() *DbObject {
 	newDbObject := &DbObject{}
 	return newDbObject
 }
 
 func (d *DbObject) Save() error {
-	err := mongo.Insert(d)
+	err := db.Insert(d)
 	if err != nil {
 		return err
 	}

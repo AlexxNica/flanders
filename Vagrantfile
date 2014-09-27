@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
+  # COMMENT
   # config.vm.define "flanders" do |v|
   #   v.vm.provider "docker" do |d|
   #     d.build_dir = "."

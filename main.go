@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"github.com/spacemonkeygo/spacelog"
 	"lab.getweave.com/weave/flanders/db"
+	_ "lab.getweave.com/weave/flanders/db/mongo"
 	"lab.getweave.com/weave/flanders/hep"
-	"log"
+	_ "log"
 	"net"
 )
 
 func main() {
 	logger := spacelog.GetLogger()
 	logger.Debug("Testing logger")
-	UDPServer("127.0.0.1", 9060)
+	UDPServer("0.0.0.0", 9060)
 }
+
+var test int
 
 func UDPServer(ip string, port int) {
 	addr := net.UDPAddr{
@@ -63,7 +66,7 @@ func UDPServer(ip string, port int) {
 
 		err = dbObject.Save()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 			continue
 		}
 	}

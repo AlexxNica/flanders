@@ -129,7 +129,7 @@ func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
 }
 func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
 	var err error
-	if len(udpPacket) < 20 {
+	if len(udpPacket) < 21 {
 		return errors.New("Found HEP ID for HEP v1, but length of packet is too short to be HEP1")
 	}
 	packetLength := len(udpPacket)
