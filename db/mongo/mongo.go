@@ -42,13 +42,12 @@ func (m *MongoDb) Find(params db.SearchMap, options db.OptionsMap, result []db.D
 	collection := m.connection.DB(DB_NAME).C("message")
 	query := collection.Find(params)
 
-	var sort []string
-	var okSort bool
-
-	sort, okSort = options["sort"]
-	if okSort {
+	sort := options.Sort
+	if sort != nil {
 		query = query.Sort(sort...)
 	} else {
 		query = query.Sort("Timestamp")
 	}
+
+	return nil
 }

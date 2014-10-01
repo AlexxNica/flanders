@@ -50,7 +50,10 @@ type DbObject struct {
 }
 
 type SearchMap map[string]interface{}
-type OptionsMap map[string]interface{}
+type OptionsMap struct {
+	Sort  []string
+	Limit uint
+}
 
 type DbHandler interface {
 	Connect(connectString string) error

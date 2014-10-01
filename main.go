@@ -8,6 +8,7 @@ import (
 	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
+	"strconv"
 )
 
 func main() {
@@ -17,6 +18,17 @@ func main() {
 }
 
 var test int
+
+func WebServer(ip string, port int) {
+	mux := net.http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprintf(w, "Welcome to the home page!")
+	})
+
+	n := negroni.Classic()
+	n.UseHandler(mux)
+	n.Run(":" + port)
+}
 
 func UDPServer(ip string, port int) {
 	addr := net.UDPAddr{
