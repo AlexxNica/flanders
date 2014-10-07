@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-var db DbHandler
+var Db DbHandler
 
 type DbObject struct {
 	Timestamp       uint32
@@ -50,7 +50,7 @@ type DbObject struct {
 }
 
 type SearchMap map[string]interface{}
-type OptionsMap struct {
+type Options struct {
 	Sort  []string
 	Limit uint
 }
@@ -58,12 +58,12 @@ type OptionsMap struct {
 type DbHandler interface {
 	Connect(connectString string) error
 	Insert(dbObject *DbObject) error
-	Find(params SearchMap, options OptionsMap, result []DbObject) error
+	Find(params SearchMap, options *Options, result *[]DbObject) error
 }
 
 func RegisterHandler(dbHandler DbHandler) {
-	db = dbHandler
-	err := db.Connect("localhost")
+	Db = dbHandler
+	err := Db.Connect("localhost")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -75,7 +75,7 @@ func NewDbObject() *DbObject {
 }
 
 func (d *DbObject) Save() error {
-	err := db.Insert(d)
+	err := Db.Insert(d)
 	if err != nil {
 		return err
 	}

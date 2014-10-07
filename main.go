@@ -1,33 +1,59 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/codegangsta/negroni"
 	"github.com/spacemonkeygo/spacelog"
 	"lab.getweave.com/weave/flanders/db"
-	_ "lab.getweave.com/weave/flanders/db/mongo"
+	_ "lab.getweave.com/weave/flanders/db/influx"
 	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
+	"net/http"
 	"strconv"
 )
 
 func main() {
 	logger := spacelog.GetLogger()
 	logger.Debug("Testing logger")
-	UDPServer("0.0.0.0", 9060)
+	go UDPServer("0.0.0.0", 9060)
+	go WebServer("0.0.0.0", 8080)
+	quit := make(chan struct{})
+	<-quit
 }
 
 var test int
 
 func WebServer(ip string, port int) {
-	mux := net.http.NewServeMux()
+	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Welcome to the home page!")
 	})
 
+	mux.HandleFunc("/search", func(w http.ResponseWriter, req *http.Request) {
+		searchParams := db.SearchMap{}
+		options := &db.Options{}
+
+		req.ParseForm()
+		order := req.Form["orderby"]
+		options.Sort = order
+
+		var results []db.DbObject
+
+		db.Db.Find(searchParams, options, &results)
+		jsonResults, err := json.Marshal(results)
+		if err != nil {
+			fmt.Fprint(w, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", string(jsonResults))
+	})
+
 	n := negroni.Classic()
 	n.UseHandler(mux)
-	n.Run(":" + port)
+	n.Run(":" + strconv.Itoa(port))
 }
 
 func UDPServer(ip string, port int) {

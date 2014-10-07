@@ -3,7 +3,7 @@ package mongo
 import (
 	//"fmt"
 	"gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
+	_ "gopkg.in/mgo.v2/bson"
 	"lab.getweave.com/weave/flanders/db"
 )
 
@@ -38,16 +38,20 @@ func (m *MongoDb) Insert(dbObject *db.DbObject) error {
 	return err
 }
 
-func (m *MongoDb) Find(params db.SearchMap, options db.OptionsMap, result []db.DbObject) error {
+func (m *MongoDb) Find(params db.SearchMap, options *db.Options, result *[]db.DbObject) error {
 	collection := m.connection.DB(DB_NAME).C("message")
 	query := collection.Find(params)
+	//query := collection.Find(bson.M{"SourcePort": "5060"})
 
-	sort := options.Sort
-	if sort != nil {
-		query = query.Sort(sort...)
-	} else {
-		query = query.Sort("Timestamp")
-	}
+	//sort := options.Sort
+
+	// if sort != nil {
+	// 	query = query.Sort(...sort)
+	// } else {
+	// 	query = query.Sort("Timestamp")
+	// }
+
+	query.All(result)
 
 	return nil
 }
