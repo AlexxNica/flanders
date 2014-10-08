@@ -21,11 +21,11 @@ func init() {
 	db.RegisterHandler(newInfluxHandler)
 
 	// Get DbObject struct field names for columns object
-	a := &b.DbObject{}
+	a := &db.DbObject{}
 	s := reflect.ValueOf(a).Elem()
 	typeOfT := s.Type()
 	for i := 0; i < s.NumField(); i++ {
-		typeOfT.Field(i).Name
+		newInfluxHandler.columns = append(newInfluxHandler.columns, typeOfT.Field(i).Name)
 	}
 }
 
@@ -42,8 +42,26 @@ func (i *InfluxDb) Connect(connectString string) error {
 	return nil
 }
 
-func (i *InfluxDb) Insert(dbObject *db.DbObject) error {
+func (influx *InfluxDb) Insert(dbObject *db.DbObject) error {
+	newSeries := &client.Series{
+		Name:    "message",
+		Columns: influx.columns,
+	}
+	var seriesArray []*client.Series
+	var values []interface{}
 
+	s := reflect.ValueOf(dbObject).Elem()
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		values = append(values, f.Interface())
+	}
+	newSeries.Points = append(newSeries.Points, values)
+	seriesArray = append(seriesArray, newSeries)
+
+	err := influx.connection.WriteSeries(seriesArray)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
