@@ -1,5 +1,6 @@
 node_modules
 dist
 .tmp
-.sass-cache
-components
+bower_components
+debug
+compiled
