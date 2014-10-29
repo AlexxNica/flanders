@@ -12,6 +12,7 @@ gulp.task('react', function () {
     }))
     .pipe($.react({
       harmony: true
-    }).on('error', handleErrors))
+    })
+      .on('error', handleErrors))
     .pipe(gulp.dest(DEST));
 });

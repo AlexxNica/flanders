@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 /*jshint indent: 2, node: true, nomen: true, browser: true*/
 /*global React */
 
@@ -6,15 +5,15 @@ var HighlightedLink = React.createClass({
   getDefaultProps: function (){
     return {
       activeClassName : 'active'
-    }
+    };
   },
   render: function() {
-    var className = this.isActive() ? className = this.props.activeClassName : "";
+    var className = this.isActive() ? className = this.props.activeClassName : '';
     return (
       <li className={className} onClick={this._changeLocation}>
         <a>{this.props.children}</a>
       </li>
-      );
+    );
   },
   _changeLocation: function (event) {
     event.stopPropagation();
@@ -24,21 +23,23 @@ var HighlightedLink = React.createClass({
     }
   },
   isActive: function() {
-    return window.location.pathname === this.props.href
-  },
-})
+    return window.location.pathname === this.props.href;
+  }
+});
 
 var NavButton = React.createClass({
   getInitialState: function () {
-    return {
-    };
+    return {};
   },
+
   componentDidMount: function () {
     window.addEventListener('popstate', this._update);
   },
+
   componentWillUnmount: function () {
     window.removeEventListener('popstate', this._update);
   },
+
   render: function () {
     var links = this.props.links.map(function (element, index) {
       return (
@@ -46,16 +47,18 @@ var NavButton = React.createClass({
           {element.title}
         </HighlightedLink>
       );
-      })
+    });
+
     return (
-    <ul className="nav nav-pills pull-right">
-      {links}
-    </ul>
+      <ul className="nav nav-pills pull-right">
+        {links}
+      </ul>
     );
   },
+
   _update: function (route) {
-    this.props.action && this.props.action(route)
-    this.forceUpdate()
+    this.props.action && this.props.action(route);
+    this.forceUpdate();
   }
 });
 

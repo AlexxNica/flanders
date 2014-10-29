@@ -1,8 +1,7 @@
-/** @jsx React.DOM */
 /*jshint indent: 2, node: true, nomen: true, browser: true*/
 /*global React */
 
-var revert = require('../services/revert.js')
+var revert = require('../services/revert.js');
 
 module.exports = React.createClass({
   getInitialState: function () {
@@ -10,11 +9,13 @@ module.exports = React.createClass({
       message : 'Always a pleasure scaffolding your apps.'
     };
   },
+
   reverse: function () {
     this.setState({
       message : revert(this.state.message)
     });
   },
+
   render: function () {
     return (
         <div>
@@ -30,6 +31,6 @@ module.exports = React.createClass({
             </button>
           </p>
         </div>
-      );
+    );
   }
 });

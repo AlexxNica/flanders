@@ -9,7 +9,7 @@ gulp.task('browserSync', ['build'], function () {
       baseDir: ['debug'],
       routes: {
         "/bower_components": "./bower_components"
-      },
+      }
     },
     directory: true
   });

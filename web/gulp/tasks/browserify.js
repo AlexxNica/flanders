@@ -44,7 +44,7 @@ gulp.task('browserify', function () {
       extensions: ['.js'],
       cache: {},
       packageCache: {},
-      fullPaths: false,
+      fullPaths: false
     };
     var b = browserify(options);
     if (file.vendor){
