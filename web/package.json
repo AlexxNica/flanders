@@ -19,7 +19,7 @@
     "gulp-minify-html": "^0.1.6",
     "gulp-notify": "~2.0.0",
     "gulp-open": "~0.3.0",
-    "gulp-react": "^1.0.2",
+    "gulp-react": "^2.0.x",
     "gulp-rev": "^2.0.0",
     "gulp-rimraf": "^0.1.1",
     "gulp-sourcemaps": "^1.2.4",
