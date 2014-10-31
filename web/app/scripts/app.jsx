@@ -1,9 +1,10 @@
 /*jshint indent: 2, node: true, nomen: true, browser: true*/
 /*global React */
 
-var React = require('react');
-var Reverter = require('./reverter');
-var Nav = require('./nav');
+var Nav = require('./components/nav');
+var routes = require('./routes');
+//var ClassSet = React.addons.classSet;
+
 var links = [
   {
     href: '/search',
@@ -16,11 +17,11 @@ var links = [
 ];
 
 React.render(
-  <Reverter />,
-  document.getElementById('reverter')
+  <Nav links={links} />,
+  document.getElementById('navigation')
 );
 
 React.render(
-  <Nav links={links} />,
-  document.getElementById('navigation')
+  routes,
+  document.getElementById('contents')
 );

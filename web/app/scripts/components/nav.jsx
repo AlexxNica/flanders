@@ -8,7 +8,7 @@ var HighlightedLink = React.createClass({
     };
   },
   render: function() {
-    var className = this.isActive() ? className = this.props.activeClassName : '';
+    var className = this.isActive() ? this.props.activeClassName : '';
     return (
       <li className={className} onClick={this._changeLocation}>
         <a>{this.props.children}</a>
@@ -17,13 +17,15 @@ var HighlightedLink = React.createClass({
   },
   _changeLocation: function (event) {
     event.stopPropagation();
+
     if (!this.isActive()) {
-      window.history.pushState({}, '', this.props.href);
+//      window.history.pushState({}, '', this.props.href);
+      window.location.hash = this.props.href;
       this._owner._update();
     }
   },
   isActive: function() {
-    return window.location.pathname === this.props.href;
+    return window.location.hash === '#' + this.props.href;
   }
 });
 
@@ -58,7 +60,7 @@ var NavButton = React.createClass({
 
   _update: function (route) {
     this.props.action && this.props.action(route);
-    this.forceUpdate();
+    this.forceUpdate(null);
   }
 });
 
