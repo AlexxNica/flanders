@@ -2,7 +2,7 @@
 /*global React */
 
 var HighlightedLink = React.createClass({
-  getDefaultProps: function (){
+  getDefaultProps: function() {
     return {
       activeClassName : 'active'
     };
@@ -15,7 +15,7 @@ var HighlightedLink = React.createClass({
       </li>
     );
   },
-  _changeLocation: function (event) {
+  _changeLocation: function(event) {
     event.stopPropagation();
 
     if (!this.isActive()) {
@@ -30,20 +30,20 @@ var HighlightedLink = React.createClass({
 });
 
 var NavButton = React.createClass({
-  getInitialState: function () {
+  getInitialState: function() {
     return {};
   },
 
-  componentDidMount: function () {
-    window.addEventListener('popstate', this._update);
-  },
+//  componentDidMount: function() {
+//    window.addEventListener('popstate', this._update);
+//  },
 
-  componentWillUnmount: function () {
-    window.removeEventListener('popstate', this._update);
-  },
+//  componentWillUnmount: function() {
+//    window.removeEventListener('popstate', this._update);
+//  },
 
-  render: function () {
-    var links = this.props.links.map(function (element, index) {
+  render: function() {
+    var links = this.props.links.map(function(element, index) {
       return (
         <HighlightedLink key={"links" + index} href={element.href}>
           {element.title}
@@ -58,7 +58,7 @@ var NavButton = React.createClass({
     );
   },
 
-  _update: function (route) {
+  _update: function(route) {
     this.props.action && this.props.action(route);
     this.forceUpdate(null);
   }
