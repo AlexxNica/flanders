@@ -25,10 +25,6 @@ gulp.task('browserify', function () {
       vendor: true
     },
     {
-      src: ['./compiled/reverter/index.js'],
-      dest: 'reverter.js'
-    },
-    {
       src: ['./compiled/app.js'],
       dest: 'main.js'
     },
