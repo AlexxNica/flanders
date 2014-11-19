@@ -49,7 +49,7 @@ type DbObject struct {
 	Msg             string
 }
 
-type SearchMap map[string]interface{}
+type SearchMap map[string]string
 type Options struct {
 	Sort  []string
 	Limit uint

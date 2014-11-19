@@ -1,7 +1,7 @@
 package influx
 
 import (
-	//"fmt"
+	"fmt"
 	"github.com/influxdb/influxdb/client"
 	"lab.getweave.com/weave/flanders/db"
 	"reflect"
@@ -29,12 +29,12 @@ func init() {
 	}
 }
 
-func (i *InfluxDb) Connect(connectString string) error {
+func (self *InfluxDb) Connect(connectString string) error {
 	var err error
 	config := &client.ClientConfig{
 		Database: "flanders",
 	}
-	i.connection, err = client.New(config)
+	self.connection, err = client.New(config)
 	if err != nil {
 		return err
 	}
@@ -42,10 +42,10 @@ func (i *InfluxDb) Connect(connectString string) error {
 	return nil
 }
 
-func (influx *InfluxDb) Insert(dbObject *db.DbObject) error {
+func (self *InfluxDb) Insert(dbObject *db.DbObject) error {
 	newSeries := &client.Series{
 		Name:    "message",
-		Columns: influx.columns,
+		Columns: self.columns,
 	}
 	var seriesArray []*client.Series
 	var values []interface{}
@@ -58,13 +58,34 @@ func (influx *InfluxDb) Insert(dbObject *db.DbObject) error {
 	newSeries.Points = append(newSeries.Points, values)
 	seriesArray = append(seriesArray, newSeries)
 
-	err := influx.connection.WriteSeries(seriesArray)
+	err := self.connection.WriteSeries(seriesArray)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (i *InfluxDb) Find(params db.SearchMap, options *db.Options, result *[]db.DbObject) error {
+func (self *InfluxDb) Find(params db.SearchMap, options *db.Options, result *[]db.DbObject) error {
+
+	query := "select * from message"
+	count := 0
+
+	for key, val := range params {
+		if val != "" {
+			if count > 0 {
+				query += " AND "
+			} else {
+				query += " WHERE "
+			}
+			query += key + "='" + val + "'"
+		}
+	}
+
+	results, error := self.connection.Query(query)
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	fmt.Printf("%#v\n", results[0])
 	return nil
 }
