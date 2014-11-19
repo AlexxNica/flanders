@@ -8,9 +8,9 @@ The open source project [Homer](http://www.sipcapture.org/) is a great tool for 
 diagnosing of SIP related issues in your VoIP stack. Homer has saved the day for me many times over when trying to dianose issues. 
 But Homer lacks in certain areas:
 
-- UI - the whole user interface is hideous, with areas for drag and drop that should never be drag and drop. It was obviously created by a systems engineer like most open source VoIP tools.
+- UI - the whole user interface is hideous, with areas for drag and drop that should never be drag and drop. It was obviously created by a systems engineer like most open source VoIP tools :-)
 - Requires Sip Capture Server - In most cases, this is [Kamailio](http://www.kamailio.org/). This means installing 2 tools, the capture server, and Homer, which is just a web interface over a mysql database. (Homer does now provide its own sip capture server as well, but is still a separate install)
-- Slow - It's default MySQL setup can get super slow super fast for large call volume clusters. It comes to a screetching halt and crashes sometimes if you query the data the wrong way
+- Slow - It's default MySQL setup can get super slow for large call volume clusters. It comes to a screetching halt and crashes sometimes if you query the data the wrong way if your database is large
 
 ## Goals
 
