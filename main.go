@@ -1,13 +1,13 @@
 package main
 
 import (
+	"./db"
+	_ "./db/influx"
+	"./hep"
 	"encoding/json"
 	"fmt"
 	"github.com/codegangsta/negroni"
 	"github.com/spacemonkeygo/spacelog"
-	"lab.getweave.com/weave/flanders/db"
-	_ "lab.getweave.com/weave/flanders/db/influx"
-	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
 	"net/http"
