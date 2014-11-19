@@ -1,6 +1,6 @@
 # Flanders
 
-A sip-capture server written in Golang.
+A sip-capture server written in Go.
 
 ## Inspiration
 
