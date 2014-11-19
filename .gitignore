@@ -1,5 +1,6 @@
 
 flanders
+npm-debug.log
 
 ### Golang
 
@@ -77,3 +78,6 @@ Temporary Items
 ###Vagrant###
 
 .vagrant/
+
+###Jetbrains###
+.idea
