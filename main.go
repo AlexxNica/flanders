@@ -1,42 +1,42 @@
 package main
 
 import (
-	"./db"
-	_ "./db/influx"
-	"./hep"
 	"encoding/json"
 	"fmt"
-	"github.com/codegangsta/negroni"
 	"github.com/spacemonkeygo/spacelog"
+	"github.com/zenazn/goji"
+	"github.com/zenazn/goji/web"
+	"lab.getweave.com/weave/flanders/db"
+	_ "lab.getweave.com/weave/flanders/db/influx"
+	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
 	"net/http"
-	"strconv"
 )
 
 func main() {
 	logger := spacelog.GetLogger()
 	logger.Debug("Testing logger")
 	go UDPServer("0.0.0.0", 9060)
-	go WebServer("0.0.0.0", 8080)
-	quit := make(chan struct{})
-	<-quit
+	WebServer("0.0.0.0", 8080)
+	// quit := make(chan struct{})
+	// <-quit
 }
 
 var test int
 
 func WebServer(ip string, port int) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+
+	goji.Get("/", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Welcome to the home page!")
 	})
 
-	mux.HandleFunc("/search", func(w http.ResponseWriter, req *http.Request) {
+	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		searchParams := db.SearchMap{}
 		options := &db.Options{}
 
-		req.ParseForm()
-		order := req.Form["orderby"]
+		r.ParseForm()
+		order := r.Form["orderby"]
 		options.Sort = order
 
 		var results []db.DbObject
@@ -51,9 +51,7 @@ func WebServer(ip string, port int) {
 		fmt.Fprintf(w, "%s", string(jsonResults))
 	})
 
-	n := negroni.Classic()
-	n.UseHandler(mux)
-	n.Run(":" + strconv.Itoa(port))
+	goji.Serve()
 }
 
 func UDPServer(ip string, port int) {
@@ -91,8 +89,8 @@ func UDPServer(ip string, port int) {
 			fmt.Println(hepErr)
 			continue
 		}
-		fmt.Printf("%#v\n", hepMsg)
-		fmt.Printf("%+v\n", hepMsg.SipMsg)
+		//fmt.Printf("%#v\n", hepMsg)
+		fmt.Printf("\n\nSipMessage-----------\n%+v\n", hepMsg.SipMsg.From.URI)
 
 		// Store HEP message in database
 		dbObject := db.NewDbObject()
@@ -100,6 +98,13 @@ func UDPServer(ip string, port int) {
 		dbObject.SourcePort = hepMsg.SourcePort
 		dbObject.DestinationIp = hepMsg.Ip4DestinationAddress
 		dbObject.DestinationPort = hepMsg.DestinationPort
+		dbObject.CallId = hepMsg.SipMsg.CallId
+		dbObject.FromUser = hepMsg.SipMsg.From.URI.User
+		dbObject.FromDomain = hepMsg.SipMsg.From.URI.Host
+		dbObject.FromTag = hepMsg.SipMsg.From.Tag
+		dbObject.ToUser = hepMsg.SipMsg.To.URI.User
+		dbObject.ToDomain = hepMsg.SipMsg.To.URI.Host
+		dbObject.ToTag = hepMsg.SipMsg.To.Tag
 		dbObject.Msg = hepMsg.SipMsg.Msg
 
 		err = dbObject.Save()
