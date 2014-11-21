@@ -65,7 +65,7 @@ func (self *InfluxDb) Insert(dbObject *db.DbObject) error {
 	return nil
 }
 
-func (self *InfluxDb) Find(params db.SearchMap, options *db.Options, result *[]db.DbObject) error {
+func (self *InfluxDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbObject) error {
 
 	query := "select * from message"
 	count := 0
@@ -79,6 +79,7 @@ func (self *InfluxDb) Find(params db.SearchMap, options *db.Options, result *[]d
 			}
 			query += key + "='" + val + "'"
 		}
+		count++
 	}
 
 	results, error := self.connection.Query(query)

@@ -32,7 +32,7 @@ func WebServer(ip string, port int) {
 	})
 
 	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		searchParams := db.SearchMap{}
+		filter := db.Filter{}
 		options := &db.Options{}
 
 		r.ParseForm()
@@ -41,7 +41,7 @@ func WebServer(ip string, port int) {
 
 		var results []db.DbObject
 
-		db.Db.Find(searchParams, options, &results)
+		db.Db.Find(filter, options, &results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -49,6 +49,11 @@ func WebServer(ip string, port int) {
 		}
 
 		fmt.Fprintf(w, "%s", string(jsonResults))
+	})
+
+	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		callId := c.URLParams["id"]
+
 	})
 
 	goji.Serve()
@@ -90,10 +95,10 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 		//fmt.Printf("%#v\n", hepMsg)
-		fmt.Printf("\n\nSipMessage-----------\n%+v\n", hepMsg.SipMsg.From.URI)
 
 		// Store HEP message in database
 		dbObject := db.NewDbObject()
+		dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.RespText
 		dbObject.SourceIp = hepMsg.Ip4SourceAddress
 		dbObject.SourcePort = hepMsg.SourcePort
 		dbObject.DestinationIp = hepMsg.Ip4DestinationAddress
@@ -105,7 +110,14 @@ func UDPServer(ip string, port int) {
 		dbObject.ToUser = hepMsg.SipMsg.To.URI.User
 		dbObject.ToDomain = hepMsg.SipMsg.To.URI.Host
 		dbObject.ToTag = hepMsg.SipMsg.To.Tag
+
+		// dbObject.ContactUser = hepMsg.SipMsg.Contact.URI.User
+		// dbOjbect.ContactIp =
+		// dbOjbect.ContactPort =
+
 		dbObject.Msg = hepMsg.SipMsg.Msg
+
+		fmt.Printf("\n\nDbObject-----------\n%+v\n", dbObject)
 
 		err = dbObject.Save()
 		if err != nil {

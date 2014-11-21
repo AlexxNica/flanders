@@ -7,8 +7,6 @@ import (
 var Db DbHandler
 
 type DbObject struct {
-	Timestamp       uint32
-	TimestampMicro  uint32
 	Method          string
 	ReplyReason     string
 	Ruri            string
@@ -49,7 +47,13 @@ type DbObject struct {
 	Msg             string
 }
 
-type SearchMap map[string]string
+type Filter struct {
+	StartDate string
+	EndDate   string
+	Equals    map[string]string
+	Like      map[string]string
+}
+
 type Options struct {
 	Sort  []string
 	Limit uint
@@ -58,7 +62,7 @@ type Options struct {
 type DbHandler interface {
 	Connect(connectString string) error
 	Insert(dbObject *DbObject) error
-	Find(params SearchMap, options *Options, result *[]DbObject) error
+	Find(filter *Filter, options *Options, result *[]DbObject) error
 }
 
 func RegisterHandler(dbHandler DbHandler) {

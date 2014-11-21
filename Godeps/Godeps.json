@@ -3,12 +3,22 @@
 	"GoVersion": "go1.2.1",
 	"Deps": [
 		{
+			"ImportPath": "github.com/dgv/sipparser",
+			"Rev": "0737de446d1b336ad90f501a2e397e868ddcd9a5"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/client",
+			"Comment": "v0.8.6-80-gc0779a0",
+			"Rev": "c0779a05c8e764f7fe179d46806ce0e169a8232f"
+		},
+		{
 			"ImportPath": "github.com/spacemonkeygo/spacelog",
 			"Rev": "8ef9009aee926f7504af4b8a1afc6c35670e8962"
 		},
 		{
-			"ImportPath": "gopkg.in/mgo.v2",
-			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
+			"ImportPath": "github.com/zenazn/goji",
+			"Comment": "v0.8.1-6-gdcb7f71",
+			"Rev": "dcb7f7169428645921b9914bdd4f61f1b1936564"
 		}
 	]
 }
