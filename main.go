@@ -41,7 +41,7 @@ func WebServer(ip string, port int) {
 
 		var results []db.DbObject
 
-		db.Db.Find(filter, options, &results)
+		db.Db.Find(&filter, options, &results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)
