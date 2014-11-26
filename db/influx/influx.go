@@ -5,6 +5,7 @@ import (
 	"github.com/influxdb/influxdb/client"
 	"lab.getweave.com/weave/flanders/db"
 	"reflect"
+	s "strings"
 )
 
 const (
@@ -68,18 +69,30 @@ func (self *InfluxDb) Insert(dbObject *db.DbObject) error {
 func (self *InfluxDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbObject) error {
 
 	query := "select * from message"
-	count := 0
+	conditions := make([]string, 0)
 
-	for key, val := range params {
+	if filter.StartDate != "" {
+		conditions = append(conditions, "time > '" + filter.StartDate + "'")
+	}
+	if filter.EndDate != "" {
+		conditions = append(conditions, "time < '" + filter.EndDate + "'")
+	}
+
+	for key, val := range filter.Equals {
 		if val != "" {
-			if count > 0 {
-				query += " AND "
-			} else {
-				query += " WHERE "
-			}
-			query += key + "='" + val + "'"
+			query += key + " = '" + val + "'"
 		}
-		count++
+	}
+
+	for key, val := range filter.Like {
+		if val != "" {
+			query += key + " LIKE '" + val + "'"
+		}
+	}
+
+	if len(conditions) > 0 {
+		query += " WHERE "
+		query += s.Join(conditions, " AND ")
 	}
 
 	results, error := self.connection.Query(query)
