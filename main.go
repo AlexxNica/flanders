@@ -35,6 +35,17 @@ func WebServer(ip string, port int) {
 		filter := db.Filter{}
 		options := &db.Options{}
 
+		startDate := c.URLParams["startDate"]
+		endDate := c.URLParams["endDate"]
+
+		if startDate != "" {
+			filter.StartDate = startDate
+		}
+
+		if endDate != "" {
+			filter.EndDate = endDate
+		}
+
 		r.ParseForm()
 		order := r.Form["orderby"]
 		options.Sort = order
@@ -52,7 +63,7 @@ func WebServer(ip string, port int) {
 	})
 
 	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		callId := c.URLParams["id"]
+		//callId := c.URLParams["id"]
 
 	})
 

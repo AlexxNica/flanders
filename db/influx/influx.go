@@ -72,10 +72,10 @@ func (self *InfluxDb) Find(filter *db.Filter, options *db.Options, result *[]db.
 	conditions := make([]string, 0)
 
 	if filter.StartDate != "" {
-		conditions = append(conditions, "time > '" + filter.StartDate + "'")
+		conditions = append(conditions, "time > '"+filter.StartDate+"'")
 	}
 	if filter.EndDate != "" {
-		conditions = append(conditions, "time < '" + filter.EndDate + "'")
+		conditions = append(conditions, "time < '"+filter.EndDate+"'")
 	}
 
 	for key, val := range filter.Equals {
@@ -100,6 +100,10 @@ func (self *InfluxDb) Find(filter *db.Filter, options *db.Options, result *[]db.
 		fmt.Println(error)
 	}
 
-	fmt.Printf("%#v\n", results[0])
+	for key, val := range results {
+		newDbObject := &db.DbObject{}
+	}
+
+	fmt.Printf("%#v\n", len(results))
 	return nil
 }
