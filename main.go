@@ -7,11 +7,15 @@ import (
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 	"lab.getweave.com/weave/flanders/db"
-	_ "lab.getweave.com/weave/flanders/db/influx"
 	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
 	"net/http"
+	"time"
+
+	// Choose your db handler or import your own here
+	// _ "lab.getweave.com/weave/flanders/db/influx"
+	_ "lab.getweave.com/weave/flanders/db/mongo"
 )
 
 func main() {
@@ -35,8 +39,9 @@ func WebServer(ip string, port int) {
 		filter := db.Filter{}
 		options := &db.Options{}
 
-		startDate := c.URLParams["startDate"]
-		endDate := c.URLParams["endDate"]
+		r.ParseForm()
+		startDate := r.Form.Get("startDate")
+		endDate := r.Form.Get("endDate")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -46,7 +51,6 @@ func WebServer(ip string, port int) {
 			filter.EndDate = endDate
 		}
 
-		r.ParseForm()
 		order := r.Form["orderby"]
 		options.Sort = order
 
@@ -63,7 +67,23 @@ func WebServer(ip string, port int) {
 	})
 
 	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		//callId := c.URLParams["id"]
+		callId := c.URLParams["id"]
+		fmt.Print(callId)
+		filter := db.NewFilter()
+		options := &db.Options{}
+
+		filter.Equals["callid"] = callId
+
+		var results []db.DbObject
+		db.Db.Find(&filter, options, &results)
+
+		jsonResults, err := json.Marshal(results)
+		if err != nil {
+			fmt.Fprint(w, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", string(jsonResults))
 
 	})
 
@@ -109,6 +129,7 @@ func UDPServer(ip string, port int) {
 
 		// Store HEP message in database
 		dbObject := db.NewDbObject()
+		dbObject.Datetime = time.Now()
 		dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.RespText
 		dbObject.SourceIp = hepMsg.Ip4SourceAddress
 		dbObject.SourcePort = hepMsg.SourcePort

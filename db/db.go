@@ -2,11 +2,13 @@ package db
 
 import (
 	"fmt"
+	"time"
 )
 
 var Db DbHandler
 
 type DbObject struct {
+	Datetime        time.Time
 	Method          string
 	ReplyReason     string
 	Ruri            string
@@ -54,6 +56,13 @@ type Filter struct {
 	Like      map[string]string
 }
 
+func NewFilter() Filter {
+	filter := Filter{}
+	filter.Equals = make(map[string]string)
+	filter.Like = make(map[string]string)
+	return filter
+}
+
 type Options struct {
 	Sort  []string
 	Limit uint
@@ -63,6 +72,8 @@ type DbHandler interface {
 	Connect(connectString string) error
 	Insert(dbObject *DbObject) error
 	Find(filter *Filter, options *Options, result *[]DbObject) error
+	CheckSchema() error // Check to see if the database has been setup or not. Returns nil if all is well
+	SetupSchema() error // Sets up the database schema. This will delete all data!!!
 }
 
 func RegisterHandler(dbHandler DbHandler) {

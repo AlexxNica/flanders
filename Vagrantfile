@@ -44,6 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
+
   config.vm.define "fs" do |v|
     # This box is Ubuntu 14.04 LTS with Salt pre-installed
     v.vm.box = "inflection/ubuntu-1404-salt"

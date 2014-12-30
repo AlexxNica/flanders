@@ -1,10 +1,12 @@
 package mongo
 
 import (
-	//"fmt"
+	"errors"
+	"fmt"
 	"gopkg.in/mgo.v2"
-	_ "gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2/bson"
 	"lab.getweave.com/weave/flanders/db"
+	"time"
 )
 
 const (
@@ -38,10 +40,39 @@ func (m *MongoDb) Insert(dbObject *db.DbObject) error {
 	return err
 }
 
-func (m *MongoDb) Find(params db.SearchMap, options *db.Options, result *[]db.DbObject) error {
+func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbObject) error {
 	collection := m.connection.DB(DB_NAME).C("message")
-	query := collection.Find(params)
-	//query := collection.Find(bson.M{"SourcePort": "5060"})
+
+	conditions := bson.M{}
+	var err error
+	var startDate time.Time
+	var endDate time.Time
+
+	if filter.StartDate != "" {
+		fmt.Print("Start date found... " + filter.StartDate)
+		startDate, err = time.Parse(time.RFC3339, filter.StartDate)
+		if err != nil {
+			return errors.New("Could not parse `Start Date` from filters")
+		}
+		conditions["datetime"] = bson.M{"$gte": startDate}
+	}
+	if filter.EndDate != "" {
+		fmt.Print("End date found... " + filter.EndDate)
+		endDate, err = time.Parse(time.RFC3339, filter.EndDate)
+		if err != nil {
+			return errors.New("Could not parse `End Date` from filters")
+		}
+		conditions["datetime"] = bson.M{"$lt": endDate}
+	}
+	for key, val := range filter.Equals {
+		conditions[key] = val
+	}
+
+	for key, val := range filter.Like {
+		conditions[key] = "/" + val + "/"
+	}
+
+	query := collection.Find(conditions)
 
 	//sort := options.Sort
 
@@ -53,5 +84,13 @@ func (m *MongoDb) Find(params db.SearchMap, options *db.Options, result *[]db.Db
 
 	query.All(result)
 
+	return nil
+}
+
+func (self *MongoDb) CheckSchema() error {
+	return nil
+}
+
+func (self *MongoDb) SetupSchema() error {
 	return nil
 }
