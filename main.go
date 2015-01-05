@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rs/cors"
 	"github.com/spacemonkeygo/spacelog"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
@@ -11,6 +12,7 @@ import (
 	_ "log"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
 
 	// Choose your db handler or import your own here
@@ -31,6 +33,12 @@ var test int
 
 func WebServer(ip string, port int) {
 
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:9000"},
+	})
+
+	goji.Use(c.Handler)
+
 	goji.Get("/", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Welcome to the home page!")
 	})
@@ -42,6 +50,7 @@ func WebServer(ip string, port int) {
 		r.ParseForm()
 		startDate := r.Form.Get("startDate")
 		endDate := r.Form.Get("endDate")
+		limit := r.Form.Get("limit")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -51,8 +60,23 @@ func WebServer(ip string, port int) {
 			filter.EndDate = endDate
 		}
 
+		if limit == "" {
+			options.Limit = 50
+		} else {
+			limitUint64, err := strconv.Atoi(limit)
+			if err != nil {
+				options.Limit = 50
+			} else {
+				options.Limit = limitUint64
+			}
+		}
+
 		order := r.Form["orderby"]
-		options.Sort = order
+		if len(order) == 0 {
+			options.Sort = append(options.Sort, "-datetime")
+		} else {
+			options.Sort = order
+		}
 
 		var results []db.DbObject
 
@@ -73,6 +97,7 @@ func WebServer(ip string, port int) {
 		options := &db.Options{}
 
 		filter.Equals["callid"] = callId
+		options.Sort = append(options.Sort, "datetime")
 
 		var results []db.DbObject
 		db.Db.Find(&filter, options, &results)
@@ -127,10 +152,14 @@ func UDPServer(ip string, port int) {
 		}
 		//fmt.Printf("%#v\n", hepMsg)
 
+		datetime := time.Now()
+
 		// Store HEP message in database
 		dbObject := db.NewDbObject()
-		dbObject.Datetime = time.Now()
-		dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.RespText
+		dbObject.Datetime = datetime
+		dbObject.MicroSeconds = datetime.Nanosecond() / 1000
+		dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.Resp
+		dbObject.ReplyReason = hepMsg.SipMsg.StartLine.RespText
 		dbObject.SourceIp = hepMsg.Ip4SourceAddress
 		dbObject.SourcePort = hepMsg.SourcePort
 		dbObject.DestinationIp = hepMsg.Ip4DestinationAddress

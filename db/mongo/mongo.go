@@ -74,6 +74,14 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbOb
 
 	query := collection.Find(conditions)
 
+	if options.Limit != 0 {
+		query = query.Limit(options.Limit)
+	}
+
+	if len(options.Sort) != 0 {
+		query = query.Sort(options.Sort...)
+	}
+
 	//sort := options.Sort
 
 	// if sort != nil {

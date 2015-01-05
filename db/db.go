@@ -9,6 +9,7 @@ var Db DbHandler
 
 type DbObject struct {
 	Datetime        time.Time
+	MicroSeconds    int
 	Method          string
 	ReplyReason     string
 	Ruri            string
@@ -65,7 +66,7 @@ func NewFilter() Filter {
 
 type Options struct {
 	Sort  []string
-	Limit uint
+	Limit int
 }
 
 type DbHandler interface {
