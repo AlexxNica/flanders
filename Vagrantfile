@@ -50,7 +50,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.vm.box = "inflection/ubuntu-1404-salt"
 
     v.vm.provider "virtualbox" do |vb|
-      vb.customize ["modifyvm", :id, "--memory", "2048"]
+      vb.customize ["modifyvm", :id, "--memory", "512"]
       vb.name = "freeswitch"
     end
 
