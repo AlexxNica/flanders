@@ -2,10 +2,11 @@ package influx
 
 import (
 	"fmt"
-	"github.com/influxdb/influxdb/client"
-	"lab.getweave.com/weave/flanders/db"
 	"reflect"
 	s "strings"
+
+	"github.com/influxdb/influxdb/client"
+	"github.com/weave-lab/flanders/db"
 )
 
 const (

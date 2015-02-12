@@ -3,17 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/rs/cors"
-	"github.com/spacemonkeygo/spacelog"
-	"github.com/zenazn/goji"
-	"github.com/zenazn/goji/web"
-	"lab.getweave.com/weave/flanders/db"
-	"lab.getweave.com/weave/flanders/hep"
 	_ "log"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/rs/cors"
+	"github.com/spacemonkeygo/spacelog"
+	"github.com/zenazn/goji"
+	"github.com/zenazn/goji/web"
+
+	"github.com/weave-lab/flanders/db"
+	"github.com/weave-lab/flanders/hep"
 
 	// Choose your db handler or import your own here
 	// _ "lab.getweave.com/weave/flanders/db/influx"
@@ -23,6 +25,9 @@ import (
 func main() {
 	logger := spacelog.GetLogger()
 	logger.Debug("Testing logger")
+	if logger.DebugEnabled() {
+		fmt.Print("ENABLED!!!!")
+	}
 	go UDPServer("0.0.0.0", 9060)
 	WebServer("0.0.0.0", 8080)
 	// quit := make(chan struct{})

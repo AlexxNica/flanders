@@ -8,8 +8,9 @@ import (
 	"encoding/binary"
 	"errors"
 	//"lab.getweave.com/weave/flanders/sip"
-	"github.com/dgv/sipparser"
 	"net"
+
+	"github.com/dgv/sipparser"
 )
 
 /*************************************
