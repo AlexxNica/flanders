@@ -19,7 +19,7 @@ import (
 
 	// Choose your db handler or import your own here
 	// _ "lab.getweave.com/weave/flanders/db/influx"
-	_ "lab.getweave.com/weave/flanders/db/mongo"
+	_ "github.com/weave-lab/flanders/db/mongo"
 )
 
 func main() {
