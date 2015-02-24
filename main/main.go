@@ -3,19 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	_ "log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/rs/cors"
-	"github.com/spacemonkeygo/spacelog"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
 
 	"github.com/weave-lab/flanders/db"
 	"github.com/weave-lab/flanders/hep"
+	"github.com/weave-lab/flanders/log"
 
 	// Choose your db handler or import your own here
 	// _ "lab.getweave.com/weave/flanders/db/influx"
@@ -23,11 +23,9 @@ import (
 )
 
 func main() {
-	logger := spacelog.GetLogger()
-	logger.Debug("Testing logger")
-	if logger.DebugEnabled() {
-		fmt.Print("ENABLED!!!!")
-	}
+	log.SetLogger(os.Stdout)
+	log.SetLogLevel("debug")
+
 	go UDPServer("0.0.0.0", 9060)
 	WebServer("0.0.0.0", 8080)
 	// quit := make(chan struct{})
@@ -102,6 +100,7 @@ func WebServer(ip string, port int) {
 		options := &db.Options{}
 
 		filter.Equals["callid"] = callId
+
 		options.Sort = append(options.Sort, "datetime")
 
 		var results []db.DbObject
@@ -125,7 +124,7 @@ func UDPServer(ip string, port int) {
 		Port: port,
 		IP:   net.ParseIP(ip),
 	}
-	fmt.Println("Flanders server listening on ", ip+":", port)
+	log.Info("Flanders server listening on " + ip + ":" + strconv.Itoa(port))
 	conn, err := net.ListenUDP("udp", &addr)
 	defer conn.Close()
 	if err != nil {
@@ -144,15 +143,14 @@ func UDPServer(ip string, port int) {
 		// fmt.Printf("\nPacket: %s\n", hepString)
 
 		if err != nil {
-			fmt.Println(err)
+			log.Err(err.Error())
 			continue
 		}
 
 		hepMsg, hepErr := hep.NewHepMsg(packet)
 
 		if hepErr != nil {
-			fmt.Println("ERROR PARSING HEP MESSAGE.................")
-			fmt.Println(hepErr)
+			log.Err(hepErr.Error())
 			continue
 		}
 		//fmt.Printf("%#v\n", hepMsg)
@@ -187,8 +185,6 @@ func UDPServer(ip string, port int) {
 		// dbOjbect.ContactPort =
 
 		dbObject.Msg = hepMsg.SipMsg.Msg
-
-		fmt.Printf("\n\nDbObject-----------\n%+v\n", dbObject)
 
 		err = dbObject.Save()
 		if err != nil {
