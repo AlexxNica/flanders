@@ -176,6 +176,11 @@ func UDPServer(ip string, port int) {
 		dbObject.ToUser = hepMsg.SipMsg.To.URI.User
 		dbObject.ToDomain = hepMsg.SipMsg.To.URI.Host
 		dbObject.ToTag = hepMsg.SipMsg.To.Tag
+		for _, header := range hepMsg.SipMsg.Headers {
+			if header.Header == "x-cid" {
+				dbObject.CallIdAleg = header.Val
+			}
+		}
 
 		// dbObject.ContactUser = hepMsg.SipMsg.Contact.URI.User
 		// dbOjbect.ContactIp =

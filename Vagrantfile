@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # v.vm.network "public_network"
 
     v.vm.synced_folder "salt/roots/flanders/", "/srv/salt/"
-    v.vm.synced_folder "./", "/opt/go/src/lab.getweave.com/weave/flanders"
+    v.vm.synced_folder "./", "/opt/go/src/github.com/weave-lab/flanders"
     v.vm.provision :salt do |salt|
       salt.minion_config = "salt/minion"
       salt.log_level = 'all'
