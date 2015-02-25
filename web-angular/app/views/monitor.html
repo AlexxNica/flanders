@@ -1,1 +1,44 @@
-<p>This is the monitor view.</p>
+<div class="well well-large">
+  <form>
+    <fieldset>
+      <legend>Real Time Monitor</legend>
+      <label>Filter</label>
+      <input type="text"
+       class="form-control"
+       ng-model="watch"
+        />
+      <label>Message Limit</label>
+      <input type="text"
+       class="form-control"
+       ng-model="limit"
+        />
+        <br>
+      <button id="start" class="btn" ng-class='{"btn-primary":connected==false}' ng-click="connect()">Start</button> <button id="stop" class="btn" ng-class='{"btn-primary":connected==true}' ng-click="disconnect()">Stop
+    </fieldset>
+  </form>
+</div>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Datetime</th>
+      <th>Method</th>
+      <th>Source</th>
+      <th>Destination</th>
+      <th>From User</th>
+      <th>To User</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="(key, value) in messages">
+      <td>{{value.Datetime}}</td>
+      <td>{{value.Method}}</td>
+      <td>{{value.SourceIp}}:{{value.SourcePort}}</td>
+      <td>{{value.DestinationIp}}:{{value.DestinationPort}}</td>
+      <td>{{value.FromUser}}</td>
+      <td>{{value.ToUser}}</td>
+      <td><a href="/#/call/{{value.CallId}}" class="btn btn-primary"><span class="glyphicon glyphicon-info-sign"></span></a></td>
+    </tr>
+  </tbody>
+</table>

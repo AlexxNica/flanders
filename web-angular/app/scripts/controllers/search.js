@@ -9,7 +9,7 @@
  */
 angular.module('webAngularApp')
   .controller('SearchCtrl', function ($scope, $http) {
-
+    $scope.$parent.curTab = 'search';
     $scope.filter = {
       startDate: '',
       endDate: ''
