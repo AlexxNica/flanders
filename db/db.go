@@ -83,6 +83,8 @@ func RegisterHandler(dbHandler DbHandler) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	_ = Db.SetupSchema()
 }
 
 func NewDbObject() *DbObject {

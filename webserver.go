@@ -30,13 +30,17 @@ func WebServer(ip string, port int) {
 	})
 
 	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		filter := db.Filter{}
+		filter := db.NewFilter()
 		options := &db.Options{}
 
 		r.ParseForm()
 		startDate := r.Form.Get("startDate")
 		endDate := r.Form.Get("endDate")
 		limit := r.Form.Get("limit")
+		touser := r.Form.Get("touser")
+		fromuser := r.Form.Get("fromuser")
+		todomain := r.Form.Get("todomain")
+		fromdomain := r.Form.Get("fromdomain")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -44,6 +48,14 @@ func WebServer(ip string, port int) {
 
 		if endDate != "" {
 			filter.EndDate = endDate
+		}
+
+		if user != "" {
+			filter.Equals["touser"] = touser
+		}
+
+		if domain != "" {
+			filter.Equals["fromuser"] = fromuser
 		}
 
 		if limit == "" {

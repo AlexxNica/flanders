@@ -1,28 +1,47 @@
 <div class="well well-large">
   <form>
     <fieldset>
-      <legend>Search</legend>
-      <label>Start Date</label>
-      <input type="text"
-       class="form-control"
-       ng-model="filter.startDate"
-       data-date-time-picker
-       data-language="{{en}}"
-       data-pick12HourFormat="false"
-        />
-      <label>End Date</label>
-      <input type="text"
-       class="form-control"
-       ng-model="filter.endDate"
-       data-date-time-picker
-       data-language="{{en}}"
-       data-pick12HourFormat="false"
-        />
-        <br>
-      <button type="submit" class="btn btn-primary">Submit</button>
+    <legend>Search</legend>
+      <div class="row">
+        <div class="col-md-2">
+          <label>Start Date</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.startDate"
+           data-date-time-picker
+           data-language="{{en}}"
+           data-pick12HourFormat="false"
+            />
+          <label>End Date</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.endDate"
+           data-date-time-picker
+           data-language="{{en}}"
+           data-pick12HourFormat="false"
+            />
+        </div>
+        <div class="col-md-2">
+          <label>User</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.user"
+            />
+          <label>Domain</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.domain"
+            />
+        </div>
+      </div>
+      <p></p>
+      <button type="submit" class="btn btn-primary">Search</button>
     </fieldset>
   </form>
 </div>
+
+  
+  
 
 <table class="table table-hover">
   <thead>

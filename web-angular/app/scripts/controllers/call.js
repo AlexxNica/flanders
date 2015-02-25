@@ -15,13 +15,12 @@ angular.module('webAngularApp')
     var height = 250;
     var width = 1080;
     var settings = {
-      sortIndex: 0,
-      headerSpacing: 300,
+      headerSpacing: 50,
       headerWidth: 200,
       headerHeight: 50,
-      rowHeight: 40,
+      rowHeight: 60,
       arrowSize: 5,
-      textHeight: 12
+      textHeight: 13
     }
 
 
@@ -32,12 +31,13 @@ angular.module('webAngularApp')
           var columnHeaders = {}
           var messages = data.messages;
           var sortIndex = 0;
-          var headerSpacing = 300;
-          var headerWidth = 200;
-          var headerHeight = 50;
-          var rowHeight = 60;
-          var arrowSize = 5;
-          var textHeight = 13;
+          var headerSpacing = data.settings.headerSpacing;
+          var headerWidth = data.settings.headerWidth;
+          var headerHeight = data.settings.headerHeight;
+          var rowHeight = data.settings.rowHeight;
+          var arrowSize = data.settings.arrowSize;
+          var textHeight = data.settings.textHeight;
+
           messages.forEach(function(message, index) {
             if(!columnHeaders.hasOwnProperty(message.SourceIp)) {
               columnHeaders[message.SourceIp] = sortIndex;
@@ -54,9 +54,11 @@ angular.module('webAngularApp')
           }
           columnHeadersArray.forEach(function(header, index){
             // Draw header boxes (servers)
-            var headerSquare = new Rect(index * (headerSpacing + headerWidth), 0, headerWidth, headerHeight, 5);
-            headerSquare.stroke('#000', 2);
-            headerSquare.addTo(stage)
+            // var headerSquare = new Rect(index * (headerSpacing + headerWidth), 0, headerWidth, headerHeight, 5);
+            // headerSquare.stroke('#000', 2);
+            // headerSquare.addTo(stage)
+            
+
             var headerText = new Text(header).attr({
               'x': (index * (headerSpacing + headerWidth)) + (headerWidth/2),
               'y': 20,
@@ -67,14 +69,20 @@ angular.module('webAngularApp')
             // Draw vertical lines
             var lineStartX = (index * (headerSpacing + headerWidth)) + (headerWidth/2);
 
-            new Path()
+            var verticalLine = new Path()
               .moveTo(lineStartX, headerHeight)
               .lineTo(lineStartX, headerHeight + (messages.length * rowHeight) + 20)
               .closePath()
-              .stroke('black', 1)
+              .stroke('gray', 1)
               .addTo(stage);
 
-          })
+          });
+
+          var headerLine = new Path()
+              .moveTo(0, headerHeight)
+              .lineTo(columnHeadersArray.length * (headerWidth + headerSpacing), headerHeight)
+              .stroke('gray',2)
+              .addTo(stage)
 
           messages.forEach(function(message, index) {
             var lineStartX = (columnHeaders[message.SourceIp] * (headerSpacing + headerWidth)) + (headerWidth/2)
@@ -135,6 +143,14 @@ angular.module('webAngularApp')
               'y': lineStartY - textHeight,
               textAlign: 'left',
               textFillColor: methodTextColor,
+              fontSize: textHeight,
+            }).addTo(stage);
+
+            var timeText = new Text(message.Datetime).attr({
+              'x': lineStartX + ((headerWidth+headerSpacing)/2)*leftOrRight,
+              'y': lineStartY + 4,
+              textAlign: 'center',
+              textFillColor: "#555",
               fontSize: textHeight,
             }).addTo(stage);
 

@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	DB_NAME = "flanders"
+	DB_NAME         = "flanders"
+	DATA_EXPIRATION = 14 // in Days
 )
 
 type MongoDb struct {
@@ -70,7 +71,7 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbOb
 	}
 
 	for key, val := range filter.Like {
-		conditions[key] = "/" + val + "/"
+		conditions[key] = bson.M{"$regex": bson.RegEx{`\` + val + `\`, ""}}
 	}
 
 	query := collection.Find(conditions)
@@ -96,10 +97,73 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbOb
 	return nil
 }
 
-func (self *MongoDb) CheckSchema() error {
+func (m *MongoDb) CheckSchema() error {
 	return nil
 }
 
-func (self *MongoDb) SetupSchema() error {
+func (m *MongoDb) SetupSchema() error {
+	collection := m.connection.DB(DB_NAME).C("message")
+	var err error
+
+	fromuserIndex := mgo.Index{
+		Key:        []string{"fromuser"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(fromuserIndex)
+	if err != nil {
+		return err
+	}
+
+	fromdomainIndex := mgo.Index{
+		Key:        []string{"fromdomain"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(fromdomainIndex)
+	if err != nil {
+		return err
+	}
+
+	touserIndex := mgo.Index{
+		Key:        []string{"touser"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(touserIndex)
+	if err != nil {
+		return err
+	}
+
+	todomainIndex := mgo.Index{
+		Key:        []string{"todomain"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(todomainIndex)
+	if err != nil {
+		return err
+	}
+
+	datetimeIndex := mgo.Index{
+		Key:         []string{"datetime"},
+		Unique:      false,
+		DropDups:    false,
+		Background:  true,
+		Sparse:      false,
+		ExpireAfter: time.Duration(DATA_EXPIRATION*24) * time.Hour,
+	}
+	err = collection.EnsureIndex(datetimeIndex)
+	if err != nil {
+		return err
+	}
 	return nil
 }
