@@ -56,7 +56,6 @@ func UDPServer(ip string, port int) {
 			log.Err(hepErr.Error())
 			continue
 		}
-		log.Debug(string(packet))
 
 		switch hepMsg.SipMsg.StartLine.Method {
 		case "OPTIONS":
@@ -75,6 +74,8 @@ func UDPServer(ip string, port int) {
 		case "NOTIFY":
 			continue
 		}
+
+		log.Debug(string(packet))
 
 		datetime := time.Now()
 
