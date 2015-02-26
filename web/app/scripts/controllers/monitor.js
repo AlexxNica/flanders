@@ -25,12 +25,13 @@ angular.module('webAngularApp')
           new_uri = "ws:";
       }
       new_uri += "//" + loc.host;
-      new_uri += loc.pathname + "ws/";
+      new_uri += loc.pathname + "ws";
 
       if($scope.watch == '') {
         $scope.watch = 'invite'
       }
-      ws = $websocket(new_uri + $scope.watch);
+      ws = $websocket(new_uri + '?filter=' + $scope.watch);
+      //ws = $websocket(new_uri);
 
       ws.onOpen(function(event){
         $scope.connected = true;

@@ -11,6 +11,7 @@ module.exports = function (grunt) {
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
+  grunt.loadNpmTasks('grunt-connect-proxy');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
@@ -71,11 +72,21 @@ module.exports = function (grunt) {
         hostname: 'localhost',
         livereload: 35729
       },
+      proxies: [
+        {
+          context: ['/search','/call','/ws'],
+          host: '12.0.0.2',
+          port: 8000,
+          ws: true,
+        }
+      ],
       livereload: {
         options: {
           open: true,
-          middleware: function (connect) {
-            return [
+          middleware: function (connect, options, middlewares) {
+
+
+            middlewares = [
               connect.static('.tmp'),
               connect().use(
                 '/bower_components',
@@ -83,6 +94,11 @@ module.exports = function (grunt) {
               ),
               connect.static(appConfig.app)
             ];
+
+
+            middlewares.push(require('grunt-connect-proxy/lib/utils').proxyRequest)
+
+            return middlewares
           }
         }
       },
@@ -363,6 +379,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       'clean:server',
       'wiredep',
+      'configureProxies:server',
       'concurrent:server',
       'autoprefixer',
       'connect:livereload',

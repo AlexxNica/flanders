@@ -2,6 +2,7 @@ package flanders
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -115,8 +116,9 @@ func WebServer(ip string, port int) {
 
 	})
 
-	goji.Get("/ws/:filter", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		filter := c.URLParams["filter"]
+	goji.Get("/ws", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		filter := r.Form.Get("filter")
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -146,7 +148,7 @@ func WebServer(ip string, port int) {
 	})
 
 	goji.Get("/*", http.FileServer(http.Dir("www")))
-
+	flag.Set("bind", ip+":"+strconv.Itoa(port))
 	goji.Serve()
 }
 

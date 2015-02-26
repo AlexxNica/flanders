@@ -14,7 +14,7 @@ angular.module('webAngularApp')
     var stream {
       connect: function() {
         
-      },
+      }
     }
 
     // Public API here
