@@ -22,20 +22,32 @@
             />
         </div>
         <div class="col-md-2">
-          <label>User</label>
+          <label>To User</label>
           <input type="text"
            class="form-control"
-           ng-model="filter.user"
+           ng-model="filter.touser"
             />
-          <label>Domain</label>
+          <label>From User</label>
           <input type="text"
            class="form-control"
-           ng-model="filter.domain"
+           ng-model="filter.fromuser"
+            />
+        </div>
+        <div class="col-md-2">
+          <label>To Domain</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.todomain"
+            />
+          <label>From Domain</label>
+          <input type="text"
+           class="form-control"
+           ng-model="filter.fromdomain"
             />
         </div>
       </div>
       <p></p>
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" ng-click="search()" class="btn btn-primary">Search</button>
     </fieldset>
   </form>
 </div>

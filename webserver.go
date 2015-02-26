@@ -25,9 +25,7 @@ func WebServer(ip string, port int) {
 
 	goji.Use(CORS)
 
-	goji.Get("/", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to the home page!")
-	})
+	goji.Get("/*", http.FileServer(http.Dir("www")))
 
 	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		filter := db.NewFilter()
@@ -38,9 +36,7 @@ func WebServer(ip string, port int) {
 		endDate := r.Form.Get("endDate")
 		limit := r.Form.Get("limit")
 		touser := r.Form.Get("touser")
-		fromuser := r.Form.Get("fromuser")
 		todomain := r.Form.Get("todomain")
-		fromdomain := r.Form.Get("fromdomain")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -50,12 +46,20 @@ func WebServer(ip string, port int) {
 			filter.EndDate = endDate
 		}
 
-		if user != "" {
+		if touser != "" {
 			filter.Equals["touser"] = touser
 		}
 
-		if domain != "" {
-			filter.Equals["fromuser"] = fromuser
+		if todomain != "" {
+			filter.Equals["todomain"] = fromuser
+		}
+
+		if fromuser != "" {
+			filter.Equals["fromuser"] = touser
+		}
+
+		if fromdomain != "" {
+			filter.Equals["fromdomain"] = fromuser
 		}
 
 		if limit == "" {

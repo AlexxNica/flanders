@@ -12,20 +12,41 @@ angular.module('webAngularApp')
     $scope.$parent.curTab = 'search';
     $scope.filter = {
       startDate: '',
-      endDate: ''
+      endDate: '',
+      touser: '',
+      todomain: '',
+      fromuser: '',
+      fromdomain: ''
     };
 
-    $http({method: 'GET', url: 'http://12.0.0.2:8000/search?limit=50&startDate=' + $scope.filter.startDate + '&endDate=' + $scope.filter.endDate}).
-      success(function(data, status, headers, config) {
-        console.log(data);
-        $scope.messages = data;
-      }).
-      error(function(data, status, headers, config) {
-        console.error(data);
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-      });
+    var urlBase = "http://12.0.0.2:8000/search?limit=100"
 
+    $scope.search = function() {
+      var url = urlBase;
+      for(var key in $scope.filter) {
+        if($scope.filter[key] != '') {
+          url += "&" + key + "=" + $scope.filter[key];
+        }
+      }
+      $http({ method: 'GET', url: url }).
+        success(function(data, status, headers, config) {
+          var mydata;
+          if(!data || data == 'null') {
+            mydata = new Array();
+          }
+          else {
+            mydata = data;
+          }
+          console.log(mydata);
+          $scope.messages = mydata;
+        }).
+        error(function(data, status, headers, config) {
+          console.error(data);
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+        });
+    }
 
+    $scope.search();
 
   });
