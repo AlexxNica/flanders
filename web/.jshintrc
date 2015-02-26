@@ -1,36 +1,23 @@
 {
-  "globals": {
-    "require": true,
-    "define": true,
-    "describe": true,
-    "expect": true,
-    "it": true,
-    "window": true,
-    "gulp": true,
-    "module": true
-  },
   "node": true,
+  "browser": true,
   "esnext": true,
-  "bitwise": false,
-  "camelcase": false,
+  "bitwise": true,
+  "camelcase": true,
   "curly": true,
   "eqeqeq": true,
-  "freeze": false,
   "immed": true,
-  "latedef": "nofunc",
-  "newcap": false,
+  "indent": 2,
+  "latedef": true,
+  "newcap": true,
   "noarg": true,
-  "regexp": true,
+  "quotmark": "single",
   "undef": true,
   "unused": true,
-  "strict": false,
-  "trailing": false,
+  "strict": true,
+  "trailing": true,
   "smarttabs": true,
-  "white": false,
-  "forin": false,
-  "expr": true,
-  "laxbreak": true,
-  "laxcomma": true,
-  "sub": true
+  "globals": {
+    "angular": false
+  }
 }
-
