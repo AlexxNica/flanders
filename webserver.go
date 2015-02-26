@@ -25,8 +25,6 @@ func WebServer(ip string, port int) {
 
 	goji.Use(CORS)
 
-	goji.Get("/*", http.FileServer(http.Dir("www")))
-
 	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		filter := db.NewFilter()
 		options := &db.Options{}
@@ -146,6 +144,8 @@ func WebServer(ip string, port int) {
 			}
 		}
 	})
+
+	goji.Get("/*", http.FileServer(http.Dir("www")))
 
 	goji.Serve()
 }

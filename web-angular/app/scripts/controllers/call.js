@@ -162,7 +162,7 @@ angular.module('webAngularApp')
       height: 600
     });
 
-    $http({method: 'GET', url: 'http://12.0.0.2:8000/call/' + $scope.callId}).
+    $http({method: 'GET', url: '/call/' + $scope.callId}).
       success(function(data, status, headers, config) {
         console.log(data);
         $scope.messages = data;

@@ -18,10 +18,19 @@ angular.module('webAngularApp')
     $scope.err = '';
 
     $scope.connect = function() {
+      var loc = window.location, new_uri;
+      if (loc.protocol === "https:") {
+          new_uri = "wss:";
+      } else {
+          new_uri = "ws:";
+      }
+      new_uri += "//" + loc.host;
+      new_uri += loc.pathname + "ws/";
+
       if($scope.watch == '') {
         $scope.watch = 'invite'
       }
-      ws = $websocket('ws://12.0.0.2:8000/ws/' + $scope.watch);
+      ws = $websocket(new_uri + $scope.watch);
 
       ws.onOpen(function(event){
         $scope.connected = true;

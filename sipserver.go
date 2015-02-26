@@ -57,6 +57,25 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 		log.Debug(string(packet))
+
+		switch hepMsg.SipMsg.StartLine.Method {
+		case "OPTIONS":
+			continue
+		case "SUBSCRIBE":
+			continue
+		case "NOTIFY":
+			continue
+		}
+
+		switch hepMsg.SipMsg.Cseq.Method {
+		case "OPTIONS":
+			continue
+		case "SUBSCRIBE":
+			continue
+		case "NOTIFY":
+			continue
+		}
+
 		datetime := time.Now()
 
 		dbObject := db.NewDbObject()
@@ -76,6 +95,7 @@ func UDPServer(ip string, port int) {
 		dbObject.ToDomain = hepMsg.SipMsg.To.URI.Host
 		dbObject.ToTag = hepMsg.SipMsg.To.Tag
 		dbObject.UserAgent = hepMsg.SipMsg.UserAgent
+		dbObject.Cseq = hepMsg.SipMsg.Cseq.Val
 		for _, header := range hepMsg.SipMsg.Headers {
 			if header.Header == "x-cid" {
 				dbObject.CallIdAleg = header.Val

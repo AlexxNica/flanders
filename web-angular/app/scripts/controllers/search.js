@@ -19,7 +19,7 @@ angular.module('webAngularApp')
       fromdomain: ''
     };
 
-    var urlBase = "http://12.0.0.2:8000/search?limit=100"
+    var urlBase = "/search?limit=100"
 
     $scope.search = function() {
       var url = urlBase;
