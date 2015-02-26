@@ -37,6 +37,8 @@ func WebServer(ip string, port int) {
 		limit := r.Form.Get("limit")
 		touser := r.Form.Get("touser")
 		todomain := r.Form.Get("todomain")
+		fromuser := r.Form.Get("fromuser")
+		fromdomain := r.Form.Get("fromdomain")
 
 		if startDate != "" {
 			filter.StartDate = startDate
