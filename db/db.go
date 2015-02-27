@@ -50,6 +50,20 @@ type DbObject struct {
 	Msg             string
 }
 
+type DbResult []DbObject
+
+func (slice DbResult) Len() int {
+	return len(slice)
+}
+
+func (slice DbResult) Less(i, j int) bool {
+	return slice[i].Datetime.Before(slice[j].Datetime)
+}
+
+func (slice DbResult) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
 type Filter struct {
 	StartDate string
 	EndDate   string
@@ -72,7 +86,7 @@ type Options struct {
 type DbHandler interface {
 	Connect(connectString string) error
 	Insert(dbObject *DbObject) error
-	Find(filter *Filter, options *Options, result *[]DbObject) error
+	Find(filter *Filter, options *Options, result *DbResult) error
 	CheckSchema() error // Check to see if the database has been setup or not. Returns nil if all is well
 	SetupSchema() error // Sets up the database schema. This will delete all data!!!
 }

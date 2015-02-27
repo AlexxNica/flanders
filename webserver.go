@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 
 	"github.com/gorilla/websocket"
@@ -81,7 +82,7 @@ func WebServer(ip string, port int) {
 			options.Sort = order
 		}
 
-		var results []db.DbObject
+		var results db.DbResult
 
 		db.Db.Find(&filter, options, &results)
 		jsonResults, err := json.Marshal(results)
@@ -95,24 +96,22 @@ func WebServer(ip string, port int) {
 
 	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		callId := c.URLParams["id"]
-		log.Debug("Call ID: " + callId)
-		filter := db.NewFilter()
-		options := &db.Options{}
-		callIdMap := make(map[string]interface{})
-		callIdALegMap := make(map[string]interface{})
-		callIdMap["callid"] = callId
-		callIdALegMap["callidaleg"] = callId
-		filter.Equals["$or"] = []interface{}{
-			callIdMap,
-			callIdALegMap,
+
+		var finalresults db.DbResult
+
+		finalresults = getPacketsByCallId(callId, "")
+
+		sort.Sort(finalresults)
+
+		var dedupresults db.DbResult
+
+		for key, val := range finalresults {
+			if key == 0 || val != finalresults[key-1] {
+				dedupresults = append(dedupresults, val)
+			}
 		}
 
-		options.Sort = append(options.Sort, "datetime")
-
-		var results []db.DbObject
-		db.Db.Find(&filter, options, &results)
-
-		jsonResults, err := json.Marshal(results)
+		jsonResults, err := json.Marshal(dedupresults)
 		if err != nil {
 			fmt.Fprint(w, err)
 			return
@@ -153,9 +152,79 @@ func WebServer(ip string, port int) {
 		}
 	})
 
+	// goji.Get("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
+
+	// })
+
+	// goji.Post("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
+	// 	filter := db.NewFilter()
+	// 	options := &db.Options{}
+	// 	//r.ParseForm()
+	// 	name := r.FormValue("name")
+	// 	ip := r.FormValue("ip")
+
+	// 	var results []db.DbObject
+	// 	db.Db.Find(&filter, options, &results)
+
+	// 	jsonResults, err := json.Marshal(results)
+	// 	if err != nil {
+	// 		fmt.Fprint(w, err)
+	// 		return
+	// 	}
+
+	// 	fmt.Fprintf(w, "%s", string(jsonResults))
+	// })
+
+	// goji.Put("/settings/alias/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
+	// 	//r.ParseForm()
+	// 	aliusId := c.URLParams["id"]
+	// 	name := r.FormValue("name")
+	// 	ip := r.FormValue("ip")
+	// })
+
+	// goji.Delete("/settings/alias/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
+	// 	aliusId := c.URLParams["id"]
+	// })
+
 	goji.Get("/*", http.FileServer(http.Dir("www")))
 	flag.Set("bind", ip+":"+strconv.Itoa(port))
 	goji.Serve()
+}
+
+func getPacketsByCallId(callId string, excludeCallId string) db.DbResult {
+	var results db.DbResult
+	filter := db.NewFilter()
+	options := &db.Options{}
+	callIdMap := make(map[string]interface{})
+	callIdALegMap := make(map[string]interface{})
+
+	callIdMap["callid"] = callId
+	callIdALegMap["callidaleg"] = callId
+
+	filter.Equals["$or"] = []interface{}{
+		callIdMap,
+		callIdALegMap,
+	}
+
+	options.Sort = append(options.Sort, "datetime")
+	db.Db.Find(&filter, options, &results)
+	altCallIds := make(map[string]bool)
+	for _, msg := range results {
+		if excludeCallId != "" && msg.CallIdAleg == excludeCallId {
+			continue
+		}
+		if msg.CallId != callId {
+			_, ok := altCallIds[msg.CallId]
+			if !ok {
+				altCallIds[msg.CallId] = true
+			}
+		}
+	}
+	for newCallId, _ := range altCallIds {
+		results = append(results, getPacketsByCallId(newCallId, callId)...)
+	}
+
+	return results
 }
 
 func CORS(h http.Handler) http.Handler {

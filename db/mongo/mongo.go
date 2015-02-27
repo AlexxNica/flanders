@@ -42,7 +42,7 @@ func (m *MongoDb) Insert(dbObject *db.DbObject) error {
 	return err
 }
 
-func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *[]db.DbObject) error {
+func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResult) error {
 	collection := m.connection.DB(DB_NAME).C("message")
 
 	conditions := bson.M{}
