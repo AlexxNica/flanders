@@ -170,6 +170,9 @@ angular.module('webAngularApp')
     $http({method: 'GET', url: '/call/' + $scope.callId}).
       success(function(data, status, headers, config) {
         console.log(data);
+        if(data == "null" || !!!data) {
+          data = [];
+        }
         $scope.messages = data;
         height = data.length * settings.rowHeight + settings.headerHeight + settings.bottomPadding;
         generateImage(1080,height)

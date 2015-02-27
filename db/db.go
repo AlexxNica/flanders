@@ -53,13 +53,13 @@ type DbObject struct {
 type Filter struct {
 	StartDate string
 	EndDate   string
-	Equals    map[string]string
+	Equals    map[string]interface{}
 	Like      map[string]string
 }
 
 func NewFilter() Filter {
 	filter := Filter{}
-	filter.Equals = make(map[string]string)
+	filter.Equals = make(map[string]interface{})
 	filter.Like = make(map[string]string)
 	return filter
 }

@@ -98,8 +98,14 @@ func WebServer(ip string, port int) {
 		log.Debug("Call ID: " + callId)
 		filter := db.NewFilter()
 		options := &db.Options{}
-
-		filter.Equals["callid"] = callId
+		callIdMap := make(map[string]interface{})
+		callIdALegMap := make(map[string]interface{})
+		callIdMap["callid"] = callId
+		callIdALegMap["callidaleg"] = callId
+		filter.Equals["$or"] = []interface{}{
+			callIdMap,
+			callIdALegMap,
+		}
 
 		options.Sort = append(options.Sort, "datetime")
 
