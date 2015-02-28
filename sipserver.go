@@ -43,12 +43,15 @@ func UDPServer(ip string, port int) {
 
 		length, _, err := conn.ReadFromUDP(packet)
 
-		packet = packet[:length]
-
 		if err != nil {
 			log.Err(err.Error())
 			continue
 		}
+
+		packet = packet[:length]
+
+		//log.Debug(string(packet))
+		fmt.Printf("[% 3X]", packet)
 
 		hepMsg, hepErr := hep.NewHepMsg(packet)
 
@@ -75,9 +78,14 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 
-		log.Debug(string(packet))
+		var datetime time.Time
 
-		datetime := time.Now()
+		log.Debug(string(packet))
+		if hepMsg.Timestamp != 0 {
+			datetime = time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)
+		} else {
+			datetime = time.Now()
+		}
 
 		dbObject := db.NewDbObject()
 		dbObject.Datetime = datetime

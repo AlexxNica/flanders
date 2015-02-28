@@ -19,7 +19,8 @@ import (
 
 // HEP ID
 const (
-	HEP_ID1 = 0x01100211
+	HEP_ID1 = 0x011002
+	HEP_ID2 = 0x021002
 	HEP_ID3 = 0x48455033
 )
 
@@ -99,7 +100,7 @@ type HepMsg struct {
 	Timestamp             uint32
 	TimestampMicro        uint32
 	ProtocolType          byte
-	CaptureAgentId        uint32
+	CaptureAgentId        uint16
 	KeepAliveTimer        uint16
 	AuthenticateKey       string
 	Body                  string
@@ -117,13 +118,13 @@ func NewHepMsg(packet []byte) (*HepMsg, error) {
 }
 
 func (hepMsg *HepMsg) Parse(udpPacket []byte) error {
-	hepIdSlice := udpPacket[:4]
-	hepIdInt := binary.BigEndian.Uint32(hepIdSlice)
 
-	switch hepIdInt {
-	case HEP_ID1:
+	switch udpPacket[0] {
+	case 0x01:
 		return hepMsg.ParseHep1(udpPacket)
-	case HEP_ID3:
+	case 0x02:
+		return hepMsg.ParseHep2(udpPacket)
+	case 0x48:
 		return hepMsg.ParseHep3(udpPacket)
 	default:
 		err := errors.New("Not a valid HEP packet - HEP ID does not match spec")
@@ -143,6 +144,33 @@ func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
 	hepMsg.Body = string(udpPacket[16:])
 	if len(udpPacket[16:packetLength-4]) > 1 {
 		hepMsg.SipMsg = sipparser.ParseMsg(string(udpPacket[16:packetLength]))
+		//hepMsg.SipMsg, err = sip.NewSipMsg(udpPacket[16 : packetLength-4])
+		if hepMsg.SipMsg.Error != nil {
+			return hepMsg.SipMsg.Error
+		}
+	} else {
+
+	}
+
+	return nil
+}
+
+func (hepMsg *HepMsg) ParseHep2(udpPacket []byte) error {
+	//var err error
+	if len(udpPacket) < 31 {
+		return errors.New("Found HEP ID for HEP v1, but length of packet is too short to be HEP1 or is NAT keepalive")
+	}
+	packetLength := len(udpPacket)
+	hepMsg.SourcePort = binary.BigEndian.Uint16(udpPacket[4:6])
+	hepMsg.DestinationPort = binary.BigEndian.Uint16(udpPacket[6:8])
+	hepMsg.Ip4SourceAddress = net.IP(udpPacket[8:12]).String()
+	hepMsg.Ip4DestinationAddress = net.IP(udpPacket[12:16]).String()
+	hepMsg.Timestamp = binary.LittleEndian.Uint32(udpPacket[16:20])
+	hepMsg.TimestampMicro = binary.LittleEndian.Uint32(udpPacket[20:24])
+	hepMsg.CaptureAgentId = binary.BigEndian.Uint16(udpPacket[24:26])
+	hepMsg.Body = string(udpPacket[28:])
+	if len(udpPacket[28:packetLength-4]) > 1 {
+		hepMsg.SipMsg = sipparser.ParseMsg(string(udpPacket[28:packetLength]))
 		//hepMsg.SipMsg, err = sip.NewSipMsg(udpPacket[16 : packetLength-4])
 		if hepMsg.SipMsg.Error != nil {
 			return hepMsg.SipMsg.Error
@@ -189,7 +217,7 @@ func (hepMsg *HepMsg) ParseHep3(udpPacket []byte) error {
 		case PROTOCOL_TYPE:
 			hepMsg.ProtocolType = chunkBody[0]
 		case CAPTURE_AGENT_ID:
-			hepMsg.CaptureAgentId = binary.BigEndian.Uint32(chunkBody)
+			hepMsg.CaptureAgentId = binary.BigEndian.Uint16(chunkBody)
 		case KEEP_ALIVE_TIMER:
 			hepMsg.KeepAliveTimer = binary.BigEndian.Uint16(chunkBody)
 		case AUTHENTICATE_KEY:
