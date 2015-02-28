@@ -7,8 +7,14 @@ import (
 
 var Db DbHandler
 
+type DbTime time.Time
+
+func (t DbTime) MarshalText() ([]byte, error) {
+	return []byte(time.Time(t).Format("Jan 2, 2006 at 3:04pm (MST)")), nil
+}
+
 type DbObject struct {
-	Datetime        time.Time
+	Datetime        DbTime
 	MicroSeconds    int
 	Method          string
 	ReplyReason     string
@@ -57,7 +63,7 @@ func (slice DbResult) Len() int {
 }
 
 func (slice DbResult) Less(i, j int) bool {
-	return slice[i].Datetime.Before(slice[j].Datetime)
+	return time.Time(slice[i].Datetime).Before(time.Time(slice[j].Datetime))
 }
 
 func (slice DbResult) Swap(i, j int) {

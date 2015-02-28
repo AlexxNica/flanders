@@ -158,7 +158,7 @@ func (hepMsg *HepMsg) ParseHep1(udpPacket []byte) error {
 func (hepMsg *HepMsg) ParseHep2(udpPacket []byte) error {
 	//var err error
 	if len(udpPacket) < 31 {
-		return errors.New("Found HEP ID for HEP v1, but length of packet is too short to be HEP1 or is NAT keepalive")
+		return errors.New("Found HEP ID for HEP v2, but length of packet is too short to be HEP2 or is NAT keepalive")
 	}
 	packetLength := len(udpPacket)
 	hepMsg.SourcePort = binary.BigEndian.Uint16(udpPacket[4:6])
