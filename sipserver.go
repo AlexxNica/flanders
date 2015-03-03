@@ -78,17 +78,17 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 
-		var datetime time.Time
+		var datetime db.Time
 
 		log.Debug(string(packet))
 		if hepMsg.Timestamp != 0 {
-			datetime = time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)
+			datetime = db.Time{time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)}
 		} else {
-			datetime = time.Now()
+			datetime = db.Time{time.Now()}
 		}
 
 		dbObject := db.NewDbObject()
-		dbObject.Datetime = db.DbTime(datetime)
+		dbObject.Datetime = datetime
 		dbObject.MicroSeconds = datetime.Nanosecond() / 1000
 		dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.Resp
 		dbObject.ReplyReason = hepMsg.SipMsg.StartLine.RespText

@@ -85,6 +85,7 @@ func WebServer(ip string, port int) {
 		var results db.DbResult
 
 		db.Db.Find(&filter, options, &results)
+		fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -152,9 +153,9 @@ func WebServer(ip string, port int) {
 		}
 	})
 
-	// goji.Get("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
+	goji.Get("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
 
-	// })
+	})
 
 	// goji.Post("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
 	// 	filter := db.NewFilter()
@@ -186,7 +187,7 @@ func WebServer(ip string, port int) {
 	// 	aliusId := c.URLParams["id"]
 	// })
 
-	goji.Get("/*", http.FileServer(http.Dir("www")))
+	goji.Get("/*", http.FileServer(http.Dir("../../gui/current")))
 	flag.Set("bind", ip+":"+strconv.Itoa(port))
 	goji.Serve()
 }
