@@ -91,7 +91,7 @@ func WebServer(ip string, port int) {
 		var results db.DbResult
 
 		db.Db.Find(&filter, options, &results)
-		fmt.Print(results)
+		//fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)

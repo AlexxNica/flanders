@@ -50,8 +50,8 @@ func UDPServer(ip string, port int) {
 
 		packet = packet[:length]
 
-		//log.Debug(string(packet))
-		fmt.Printf("[% 3X]", packet)
+		log.Debug(string(packet))
+		//fmt.Printf("[% 3X]", packet)
 
 		hepMsg, hepErr := hep.NewHepMsg(packet)
 
