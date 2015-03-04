@@ -35,21 +35,29 @@ Install MongoDB
 
 Checkout the code base
 
-```$ git clone https://github.com/weave-lab/flanders.git```
+```
+$ git clone https://github.com/weave-lab/flanders.git
+```
 
 Go into the directory
 
-```$ cd flanders```
+```
+$ cd flanders
+```
 
 #### Server
 
 Spin up the development virtual machine
 
-```$ vagrant up flanders```
+```
+$ vagrant up flanders
+```
 
 SSH into the dev VM
 
-```$ vagrant ssh flanders```
+```
+$ vagrant ssh flanders
+```
 
 Inside the VM, run the app
 
@@ -64,7 +72,9 @@ When you change the Go code in flanders, it is automatically synced to your virt
 
 In a different terminal window, change to the web directory
 
-```$ cd web```
+```
+$ cd web
+```
 
 Install all the front-end dependencies
 
@@ -77,7 +87,9 @@ $ npm install -g grunt-cli
 
 Start the dev server for user interface
 
-```$ grunt serve```
+```
+$ grunt serve
+```
 
 A browser window will popup and will show the flanders ui and will automatically connect to the flanders service running in the virtual machine.
 If you make changes to the front-end code, grunt will automatically update your browser window
