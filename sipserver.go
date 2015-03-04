@@ -50,7 +50,7 @@ func UDPServer(ip string, port int) {
 
 		packet = packet[:length]
 
-		log.Debug(string(packet))
+		//log.Debug(string(packet))
 		//fmt.Printf("[% 3X]", packet)
 
 		hepMsg, hepErr := hep.NewHepMsg(packet)
@@ -84,7 +84,7 @@ func UDPServer(ip string, port int) {
 
 		var datetime time.Time
 
-		log.Debug(string(packet))
+		//log.Debug(string(packet))
 		if hepMsg.Timestamp != 0 {
 			datetime = time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)
 		} else {
