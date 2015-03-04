@@ -214,6 +214,7 @@ func getPacketsByCallId(callId string, excludeCallId string) db.DbResult {
 	}
 
 	options.Sort = append(options.Sort, "datetime")
+	options.Sort = append(options.Sort, "microseconds")
 	db.Db.Find(&filter, options, &results)
 	altCallIds := make(map[string]bool)
 	for _, msg := range results {
