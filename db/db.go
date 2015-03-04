@@ -1,11 +1,8 @@
 package db
 
 import (
-	"encoding/binary"
 	"fmt"
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 var Db DbHandler
@@ -14,30 +11,30 @@ const (
 	DATEFORMAT = "1/2/2006 3:04:05.000pm (MST)"
 )
 
-type Time struct {
-	time.Time
-}
+// type Time struct {
+// 	time.Time
+// }
 
-func (t *Time) SetBSON(raw bson.Raw) error {
-	i := int64(binary.LittleEndian.Uint64(raw.Data))
-	if i == -62135596800000 {
-		t.Time = time.Time{} // In UTC for convenience.
-	} else {
-		t.Time = time.Unix(i/1e3, i%1e3*1e6)
-	}
-	return nil
-}
+// func (t *Time) SetBSON(raw bson.Raw) error {
+// 	i := int64(binary.LittleEndian.Uint64(raw.Data))
+// 	if i == -62135596800000 {
+// 		t.Time = time.Time{} // In UTC for convenience.
+// 	} else {
+// 		t.Time = time.Unix(i/1e3, i%1e3*1e6)
+// 	}
+// 	return nil
+// }
 
-func (t Time) MarshalText() ([]byte, error) {
-	return []byte(t.Format(DATEFORMAT)), nil
-}
+// func (t Time) MarshalText() ([]byte, error) {
+// 	return []byte(t.Format(DATEFORMAT)), nil
+// }
 
-func (t Time) MarshalJSON() ([]byte, error) {
-	return []byte(`"` + t.Format(DATEFORMAT) + `"`), nil
-}
+// func (t Time) MarshalJSON() ([]byte, error) {
+// 	return []byte(`"` + t.Format(DATEFORMAT) + `"`), nil
+// }
 
 type DbObject struct {
-	Datetime        Time
+	Datetime        time.Time
 	MicroSeconds    int
 	Method          string
 	ReplyReason     string
@@ -86,7 +83,7 @@ func (slice DbResult) Len() int {
 }
 
 func (slice DbResult) Less(i, j int) bool {
-	return slice[i].Datetime.Before(slice[j].Datetime.Time)
+	return slice[i].Datetime.Before(slice[j].Datetime)
 }
 
 func (slice DbResult) Swap(i, j int) {

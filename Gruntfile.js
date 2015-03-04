@@ -9,6 +9,10 @@ module.exports = function(grunt) {
       build_gui: {
         command: 'grunt build',
         cwd: __dirname + "/web",
+      },
+      serve_gui: {
+        command: 'grunt serve',
+        cwd: __dirname + "/web",
       }
     },
     copy: {
@@ -80,6 +84,10 @@ module.exports = function(grunt) {
   grunt.registerTask('deployGui', 'This builds and deploys the Go app to production', function() {
     grunt.task.run('exec:build_gui');
     grunt.task.run('ssh_deploy:production_gui');
+  })
+
+  grunt.registerTask('serve', 'Serve the gui', function() {
+    grunt.task.run('exec:serve_gui');
   })
 
   //grunt.registerTask('default', ['jshint', 'qunit', 'concat', 'uglify']);

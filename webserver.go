@@ -23,6 +23,12 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+var assetfolder string
+
+func init() {
+	flag.StringVar(&assetfolder, "assets", "public", "Static assets folder for GUI")
+}
+
 func WebServer(ip string, port int) {
 
 	goji.Use(CORS)
@@ -187,7 +193,7 @@ func WebServer(ip string, port int) {
 	// 	aliusId := c.URLParams["id"]
 	// })
 
-	goji.Get("/*", http.FileServer(http.Dir("../../gui/current")))
+	goji.Get("/*", http.FileServer(http.Dir(assetfolder)))
 	flag.Set("bind", ip+":"+strconv.Itoa(port))
 	goji.Serve()
 }
