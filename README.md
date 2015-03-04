@@ -21,6 +21,9 @@ This project is super young and isn't even close to production ready, and doesn'
 ## Installation
 
 Install MongoDB
+Download Flanders
+Extract Flanders
+Run Flanders
 
 
 ## Development Setup
