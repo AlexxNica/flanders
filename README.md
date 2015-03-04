@@ -18,12 +18,12 @@ Flanders is being designed to be a drop in replacement for Homer with some diffe
 
 This project is super young and isn't even close to production ready, and doesn't have nearly the features of Homer... YET. It is actively being developed here at [Weave](http://getweave.com) and so expect big changes and more stability soon.
 
-## Installation
+## Installation 
 
-Install MongoDB
-Download Flanders
-Extract Flanders
-Run Flanders
+- Install MongoDB
+- Download Flanders
+- Extract Flanders
+- Run Flanders
 
 
 ## Development Setup
