@@ -139,3 +139,13 @@ func (d *DbObject) Save() error {
 	}
 	return nil
 }
+
+// func (d DbObject) MarshalJSON() ([]byte, error) {
+// 	return json.Marshal(struct {
+// 		DbObject
+// 		Datetime string
+// 	}{
+// 		DbObject: d,
+// 		Datetime: d.Datetime.Format(DATEFORMAT),
+// 	})
+// }

@@ -67,8 +67,8 @@ func UDPServer(ip string, port int) {
 			continue
 		case "NOTIFY":
 			continue
-			// case "REGISTER":
-			// 	continue
+		case "REGISTER":
+			continue
 		}
 
 		switch hepMsg.SipMsg.Cseq.Method {
@@ -78,8 +78,8 @@ func UDPServer(ip string, port int) {
 			continue
 		case "NOTIFY":
 			continue
-			// case "REGISTER":
-			// 	continue
+		case "REGISTER":
+			continue
 		}
 
 		var datetime time.Time
