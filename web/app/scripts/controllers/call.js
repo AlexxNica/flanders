@@ -8,7 +8,7 @@
  * Controller of the webAngularApp
  */
 angular.module('webAngularApp')
-  .controller('CallCtrl', function ($scope, $routeParams, $http) {
+  .controller('CallCtrl', function ($scope, $routeParams, $http, ngDialog) {
     $scope.$parent.curTab = 'search';
     $scope.callId = $routeParams.callId;
     $scope.messages = [];
@@ -24,6 +24,12 @@ angular.module('webAngularApp')
     var height = 280;
     var width = 1080;
     var movie;
+
+    $scope.sipPopup = function (id) {
+        var sipmessage = $scope.messages[id]
+        var sipMessageArray = sipmessage.Msg.split("\n")
+        ngDialog.open({ template: 'views/sipmessage.html', data: sipMessageArray});
+    };
 
 
     var generateImage = function(width, height) {
