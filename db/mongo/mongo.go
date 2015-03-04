@@ -12,7 +12,7 @@ import (
 
 const (
 	DB_NAME         = "flanders"
-	DATA_EXPIRATION = 14 // in Days
+	DATA_EXPIRATION = 7 // in Days
 )
 
 type MongoDb struct {
@@ -105,26 +105,26 @@ func (m *MongoDb) SetupSchema() error {
 	collection := m.connection.DB(DB_NAME).C("message")
 	var err error
 
-	fromuserIndex := mgo.Index{
-		Key:        []string{"fromuser"},
+	callidIndex := mgo.Index{
+		Key:        []string{"callid"},
 		Unique:     false,
 		DropDups:   false,
 		Background: true,
 		Sparse:     false,
 	}
-	err = collection.EnsureIndex(fromuserIndex)
+	err = collection.EnsureIndex(callidIndex)
 	if err != nil {
 		return err
 	}
 
-	fromdomainIndex := mgo.Index{
-		Key:        []string{"fromdomain"},
+	callidalegIndex := mgo.Index{
+		Key:        []string{"callidaleg"},
 		Unique:     false,
 		DropDups:   false,
 		Background: true,
 		Sparse:     false,
 	}
-	err = collection.EnsureIndex(fromdomainIndex)
+	err = collection.EnsureIndex(callidalegIndex)
 	if err != nil {
 		return err
 	}
@@ -141,8 +141,32 @@ func (m *MongoDb) SetupSchema() error {
 		return err
 	}
 
+	fromuserIndex := mgo.Index{
+		Key:        []string{"fromuser"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(fromuserIndex)
+	if err != nil {
+		return err
+	}
+
+	fromdomainIndex := mgo.Index{
+		Key:        []string{"sourceip"},
+		Unique:     false,
+		DropDups:   false,
+		Background: true,
+		Sparse:     false,
+	}
+	err = collection.EnsureIndex(fromdomainIndex)
+	if err != nil {
+		return err
+	}
+
 	todomainIndex := mgo.Index{
-		Key:        []string{"todomain"},
+		Key:        []string{"destinationip"},
 		Unique:     false,
 		DropDups:   false,
 		Background: true,

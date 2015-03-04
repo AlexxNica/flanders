@@ -36,9 +36,9 @@ func WebServer(ip string, port int) {
 		endDate := r.Form.Get("endDate")
 		limit := r.Form.Get("limit")
 		touser := r.Form.Get("touser")
-		todomain := r.Form.Get("todomain")
 		fromuser := r.Form.Get("fromuser")
-		fromdomain := r.Form.Get("fromdomain")
+		sourceip := r.Form.Get("sourceip")
+		destip := r.Form.Get("destip")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -52,16 +52,16 @@ func WebServer(ip string, port int) {
 			filter.Equals["touser"] = touser
 		}
 
-		if todomain != "" {
-			filter.Equals["todomain"] = fromuser
-		}
-
 		if fromuser != "" {
-			filter.Equals["fromuser"] = touser
+			filter.Equals["fromuser"] = fromuser
 		}
 
-		if fromdomain != "" {
-			filter.Equals["fromdomain"] = fromuser
+		if sourceip != "" {
+			filter.Equals["sourceip"] = sourceip
+		}
+
+		if destip != "" {
+			filter.Equals["destinationip"] = destip
 		}
 
 		if limit == "" {

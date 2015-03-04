@@ -14,9 +14,9 @@ angular.module('webAngularApp')
       startDate: '',
       endDate: '',
       touser: '',
-      todomain: '',
       fromuser: '',
-      fromdomain: ''
+      sourceip: '',
+      destip: ''
     };
 
     var urlBase = "/search?limit=100"

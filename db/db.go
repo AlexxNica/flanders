@@ -11,7 +11,7 @@ import (
 var Db DbHandler
 
 const (
-	DATEFORMAT = "Jan 2, 2006 at 3:04pm (MST)"
+	DATEFORMAT = "1/2/2006 3:04:05.000pm (MST)"
 )
 
 type Time struct {

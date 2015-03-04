@@ -105,6 +105,5 @@ func (self *InfluxDb) Find(filter *db.Filter, options *db.Options, result *[]db.
 		newDbObject := &db.DbObject{}
 	}
 
-	fmt.Printf("%#v\n", len(results))
 	return nil
 }
