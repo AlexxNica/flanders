@@ -82,6 +82,8 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 
 	if len(options.Sort) != 0 {
 		query = query.Sort(options.Sort...)
+	} else {
+		query = query.Sort("-datetime")
 	}
 
 	//sort := options.Sort
