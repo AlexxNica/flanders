@@ -83,6 +83,10 @@ func (slice DbResult) Len() int {
 }
 
 func (slice DbResult) Less(i, j int) bool {
+	if slice[i].Datetime.Equal(slice[j].Datetime) {
+		return slice[i].MicroSeconds < slice[j].MicroSeconds
+	}
+
 	return slice[i].Datetime.Before(slice[j].Datetime)
 }
 
