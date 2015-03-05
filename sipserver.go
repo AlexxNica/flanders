@@ -60,6 +60,10 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 
+		if hepMsg.SipMsg == nil || hepMsg.SipMsg.StartLine == nil {
+			continue
+		}
+
 		switch hepMsg.SipMsg.StartLine.Method {
 		case "OPTIONS":
 			continue
@@ -71,15 +75,17 @@ func UDPServer(ip string, port int) {
 			continue
 		}
 
-		switch hepMsg.SipMsg.Cseq.Method {
-		case "OPTIONS":
-			continue
-		case "SUBSCRIBE":
-			continue
-		case "NOTIFY":
-			continue
-		case "REGISTER":
-			continue
+		if hepMsg.SipMsg.Cseq != nil {
+			switch hepMsg.SipMsg.Cseq.Method {
+			case "OPTIONS":
+				continue
+			case "SUBSCRIBE":
+				continue
+			case "NOTIFY":
+				continue
+			case "REGISTER":
+				continue
+			}
 		}
 
 		var datetime time.Time
