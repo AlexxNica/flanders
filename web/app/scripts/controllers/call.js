@@ -21,9 +21,14 @@ angular.module('webAngularApp')
       textHeight: 13,
       bottomPadding: 20,
       aliases: {
+        "64.55.135.20": "core-sip-01",
+        "10.55.0.10": "core-sip-01",
+        "10.25.0.10": "core-sip-01",
         "208.53.46.201": "core-sip-02",
         "10.55.0.11": "core-sip-02",
+        "10.25.0.11": "core-sip-02",
         "216.115.69.144": "flowroute",
+        "66.2.204.94": "XO",
         "10.55.4.35": "four-comm-06",
         "64.55.135.25": "four-comm-06"
       }
@@ -57,10 +62,9 @@ angular.module('webAngularApp')
             var aliases = data.settings.aliases;
 
             messages.forEach(function(message, index) {
-              var source, destination
-              source = aliases[message.SourceIp] || message.SourceIp
-              destination = aliases[message.DestinationIp] || message.DestinationIp
-              }
+              var source = aliases[message.SourceIp] || message.SourceIp
+              var destination = aliases[message.DestinationIp] || message.DestinationIp
+              
               if(!columnHeaders.hasOwnProperty(source)) {
                 columnHeaders[source] = sortIndex;
                 sortIndex++;
