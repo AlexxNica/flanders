@@ -20,6 +20,13 @@ angular.module('webAngularApp')
       arrowSize: 5,
       textHeight: 13,
       bottomPadding: 20,
+      aliases: {
+        "208.53.46.201": "core-sip-02",
+        "10.55.0.11": "core-sip-02",
+        "216.115.69.144": "flowroute",
+        "10.55.4.35": "four-comm-06",
+        "64.55.135.25": "four-comm-06"
+      }
     }
     var height = 280;
     var width = 1080;
@@ -30,6 +37,7 @@ angular.module('webAngularApp')
         var sipMessageArray = sipmessage.Msg.split("\n")
         ngDialog.open({ template: 'views/sipmessage.html', data: sipMessageArray});
     };
+
 
 
     var generateImage = function(width, height) {
@@ -46,14 +54,19 @@ angular.module('webAngularApp')
             var arrowSize = data.settings.arrowSize;
             var textHeight = data.settings.textHeight;
             var bottomPadding = data.settings.bottomPadding;
+            var aliases = data.settings.aliases;
 
             messages.forEach(function(message, index) {
-              if(!columnHeaders.hasOwnProperty(message.SourceIp)) {
-                columnHeaders[message.SourceIp] = sortIndex;
+              var source, destination
+              source = aliases[message.SourceIp] || message.SourceIp
+              destination = aliases[message.DestinationIp] || message.DestinationIp
+              }
+              if(!columnHeaders.hasOwnProperty(source)) {
+                columnHeaders[source] = sortIndex;
                 sortIndex++;
               }
-              if(!columnHeaders.hasOwnProperty(message.DestinationIp)) {
-                columnHeaders[message.DestinationIp] = sortIndex;
+              if(!columnHeaders.hasOwnProperty(destination)) {
+                columnHeaders[destination] = sortIndex;
                 sortIndex++;
               }
             });
@@ -94,8 +107,10 @@ angular.module('webAngularApp')
                 .addTo(stage)
 
             messages.forEach(function(message, index) {
-              var lineStartX = (columnHeaders[message.SourceIp] * (headerSpacing + headerWidth)) + (headerWidth/2)
-              var lineEndX = (columnHeaders[message.DestinationIp] * (headerSpacing + headerWidth)) + (headerWidth/2)
+              var source = aliases[message.SourceIp] || message.SourceIp
+              var destination = aliases[message.DestinationIp] || message.DestinationIp
+              var lineStartX = (columnHeaders[source] * (headerSpacing + headerWidth)) + (headerWidth/2)
+              var lineEndX = (columnHeaders[destination] * (headerSpacing + headerWidth)) + (headerWidth/2)
               var lineStartY = index * rowHeight + headerHeight + rowHeight;
               var leftOrRight = 1
 
