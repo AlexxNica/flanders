@@ -38,6 +38,10 @@ angular
         templateUrl: 'views/call.html',
         controller: 'CallCtrl'
       })
+      .when('/settings', {
+        templateUrl: 'views/settings.html',
+        controller: 'CallCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

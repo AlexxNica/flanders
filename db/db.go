@@ -78,6 +78,13 @@ type DbObject struct {
 
 type DbResult []DbObject
 
+type SettingObject struct {
+	Key string `param:"key"`
+	Val string `param:"val"`
+}
+
+type SettingResult []SettingObject
+
 func (slice DbResult) Len() int {
 	return len(slice)
 }
@@ -119,6 +126,9 @@ type DbHandler interface {
 	Find(filter *Filter, options *Options, result *DbResult) error
 	CheckSchema() error // Check to see if the database has been setup or not. Returns nil if all is well
 	SetupSchema() error // Sets up the database schema. This will delete all data!!!
+	GetSettings(settingtype string, result *SettingResult) error
+	SetSetting(settingtype string, setting SettingObject) error
+	DeleteSetting(settingtype string, key string) error
 }
 
 func RegisterHandler(dbHandler DbHandler) {

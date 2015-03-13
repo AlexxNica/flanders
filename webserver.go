@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/goji/param"
 	"github.com/gorilla/websocket"
 	"github.com/weave-lab/flanders/db"
 	"github.com/weave-lab/flanders/log"
@@ -159,13 +160,46 @@ func WebServer(ip string, port int) {
 		}
 	})
 
-	goji.Get("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
+	goji.Get("/settings/:group", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		group := c.URLParams["group"]
+		var results db.SettingResult
+		db.Db.GetSettings(group, &results)
+	})
 
+	goji.Post("/settings/:group", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		group := c.URLParams["group"]
+		r.ParseForm()
+		setting := db.SettingObject{}
+		err := param.Parse(r.Form, &setting)
+		if err != nil {
+			log.Err(err.Error())
+			return
+		}
+		dberr := db.Db.SetSetting(group, setting)
+		if dberr != nil {
+			log.Err(err.Error())
+			return
+		}
+
+		jsonResults, err := json.Marshal(setting)
+		fmt.Fprintf(w, "%s", string(jsonResults))
+	})
+
+	goji.Delete("/settings/:group/:key", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		group := c.URLParams["group"]
+		key := c.URLParams["key"]
+
+		dberr := db.Db.DeleteSetting(group, key)
+		if dberr != nil {
+			log.Err(dberr.Error())
+			fmt.Fprintf(w, "%s", "{ \"result\": false, \"error\": \""+dberr.Error()+"\" }")
+			return
+		}
+		fmt.Fprintf(w, "%s", "{ \"result\": true }")
 	})
 
 	// goji.Post("/settings/alias", func(c web.C, w http.ResponseWriter, r *http.Request) {
-	// 	filter := db.NewFilter()
-	// 	options := &db.Options{}
+
 	// 	//r.ParseForm()
 	// 	name := r.FormValue("name")
 	// 	ip := r.FormValue("ip")

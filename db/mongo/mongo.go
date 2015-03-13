@@ -99,6 +99,29 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 	return nil
 }
 
+func (m *MongoDb) GetSettings(settingtype string, result *db.SettingResult) error {
+	collection := m.connection.DB(DB_NAME).C(settingtype)
+
+	query := collection.Find(bson.M{})
+	query.All(result)
+
+	return nil
+}
+
+func (m *MongoDb) SetSetting(settingtype string, setting db.SettingObject) error {
+	collection := m.connection.DB(DB_NAME).C(settingtype)
+	_, err := collection.Upsert("key", setting)
+
+	return err
+}
+
+func (m *MongoDb) DeleteSetting(settingtype string, key string) error {
+	collection := m.connection.DB(DB_NAME).C(settingtype)
+	err := collection.Remove(bson.M{"key": key})
+
+	return err
+}
+
 func (m *MongoDb) CheckSchema() error {
 	return nil
 }
