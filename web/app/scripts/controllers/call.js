@@ -21,16 +21,6 @@ angular.module('webAngularApp')
       textHeight: 13,
       bottomPadding: 20,
       aliases: {
-        "64.55.135.20": "core-sip-01",
-        "10.55.0.10": "core-sip-01",
-        "10.25.0.10": "core-sip-01",
-        "208.53.46.201": "core-sip-02",
-        "10.55.0.11": "core-sip-02",
-        "10.25.0.11": "core-sip-02",
-        "216.115.69.144": "flowroute",
-        "66.2.204.94": "XO",
-        "10.55.4.35": "four-comm-06",
-        "64.55.135.25": "four-comm-06"
       }
     }
     var height = 280;
@@ -191,31 +181,60 @@ angular.module('webAngularApp')
       });
       return movie;
     }
-    
-    $http({method: 'GET', url: '/call/' + $scope.callId}).
-      success(function(data, status, headers, config) {
-        console.log(data);
-        if(data == "null" || !!!data) {
-          data = [];
-        }
-        $scope.messages = data;
-        height = data.length * settings.rowHeight + settings.headerHeight + settings.bottomPadding;
-        generateImage(1080,height)
-        movie.on('load', function() {
-        // receive event from the runner context
-        movie.on('message:ready', function() {
-          movie.sendMessage({
-            messages: $scope.messages,
-            settings: settings
+    $scope.getAliases = function() {
+      var url = "/settings/alias";
+      $http({ method: 'GET', url: url }).
+        success(function(data, status, headers, config) {
+          var mydata;
+          if(!data || data == 'null') {
+            mydata = new Array();
+          }
+          else {
+            mydata = data;
+          }
+          console.log(mydata);
+          $scope.aliases = mydata;
+          $scope.aliases.forEach(function(val, key) {
+            settings.aliases[val.Key] = val.Val
+          })
+          console.log(settings.aliases)
+          $scope.getCallData()
+        }).
+        error(function(data, status, headers, config) {
+          console.error(data);
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+        });
+    }
+
+    $scope.getCallData = function(){
+      $http({method: 'GET', url: '/call/' + $scope.callId}).
+        success(function(data, status, headers, config) {
+          console.log(data);
+          if(data == "null" || !!!data) {
+            data = [];
+          }
+          $scope.messages = data;
+          height = data.length * settings.rowHeight + settings.headerHeight + settings.bottomPadding;
+          generateImage(1080,height)
+          movie.on('load', function() {
+          // receive event from the runner context
+          movie.on('message:ready', function() {
+            movie.sendMessage({
+              messages: $scope.messages,
+              settings: settings
+            });
           });
         });
-      });
-      }).
-      error(function(data, status, headers, config) {
-        console.error(data);
-        // called asynchronously if an error occurs
-        // or server returns response with an error status.
-      });
-
+        }).
+        error(function(data, status, headers, config) {
+          console.error(data);
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+        });
+    }
+    
+    
+    $scope.getAliases()
     
   });
