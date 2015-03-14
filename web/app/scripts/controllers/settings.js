@@ -59,7 +59,7 @@ angular.module('webAngularApp')
           data: $.param($scope.newalias),
           headers: {'Content-Type': 'application/x-www-form-urlencoded'}
       }).success(function(data, status, headers, config) {
-          $scope.aliases.push($scope.newalias);
+          $scope.aliases.push({ Key:$scope.newalias.key, Val: $scope.newalias.val });
           $scope.newalias = {
             key: '',
             val: ''
@@ -74,7 +74,7 @@ angular.module('webAngularApp')
 
     }
 
-    $scope.deleteAlias = function(key) {
+    $scope.deleteAlias = function(index, key) {
       var url = urlBase + "/alias/" + key;
       console.log($scope.newalias)
       $http({
@@ -82,7 +82,7 @@ angular.module('webAngularApp')
           url: url,
           data: {}
       }).success(function(data, status, headers, config) {
-   
+          $scope.aliases.splice(index, 1) 
         }).
         error(function(data, status, headers, config) {
           console.error(data);
