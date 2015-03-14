@@ -40,7 +40,7 @@ angular
       })
       .when('/settings', {
         templateUrl: 'views/settings.html',
-        controller: 'CallCtrl'
+        controller: 'SettingsCtrl'
       })
       .otherwise({
         redirectTo: '/'

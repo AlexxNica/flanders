@@ -1,1 +1,42 @@
-<p>This is the settings view.</p>
+<h3>Aliases</h3>
+
+<dl>
+<dd ng-repeat="(key, value) in errors">
+<div class="alert alert-dismissible alert-{{value.type}}" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <strong>{{value.type}}!</strong> {{value.message}}
+</div>
+</dd>
+</dl>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>IP</th>
+      <th>Name</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="(key, value) in aliases">
+      <td>{{value.Key}}</td>
+      <td>{{value.Val}}</td>
+
+      <td>
+        <button class="btn btn-success btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>
+        <button ng-click="deleteAlias(value.Key)" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span></button>
+      </td>
+    </tr>
+    <tr>
+        <td>
+            <input class="form-control" type="text" placeholder="IP" ng-model="newalias.key"/>
+        </td>
+        <td>
+            <input class="form-control" type="text" placeholder="Name" ng-model="newalias.val"/>
+        </td>
+        <td>
+            <button class="btn btn-primary" ng-click="addAlias()"><span class="glyphicon glyphicon-plus"></span></button>
+        </td>
+    </tr>
+  </tbody>
+</table>

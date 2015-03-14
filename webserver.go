@@ -164,20 +164,31 @@ func WebServer(ip string, port int) {
 		group := c.URLParams["group"]
 		var results db.SettingResult
 		db.Db.GetSettings(group, &results)
+
+		jsonResults, err := json.Marshal(results)
+		if err != nil {
+			fmt.Fprint(w, err)
+			return
+		}
+
+		fmt.Fprintf(w, "%s", string(jsonResults))
+
 	})
 
 	goji.Post("/settings/:group", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		group := c.URLParams["group"]
 		r.ParseForm()
+		fmt.Println(r.PostForm)
 		setting := db.SettingObject{}
 		err := param.Parse(r.Form, &setting)
+		fmt.Printf("%#v", setting)
 		if err != nil {
 			log.Err(err.Error())
 			return
 		}
 		dberr := db.Db.SetSetting(group, setting)
 		if dberr != nil {
-			log.Err(err.Error())
+			log.Err(dberr.Error())
 			return
 		}
 

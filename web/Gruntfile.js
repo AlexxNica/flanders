@@ -74,7 +74,7 @@ module.exports = function (grunt) {
       },
       proxies: [
         {
-          context: ['/search','/call','/ws'],
+          context: ['/search','/call','/ws', '/settings'],
           host: '12.0.0.2',
           port: 8000,
           ws: true,

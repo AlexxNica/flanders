@@ -110,7 +110,7 @@ func (m *MongoDb) GetSettings(settingtype string, result *db.SettingResult) erro
 
 func (m *MongoDb) SetSetting(settingtype string, setting db.SettingObject) error {
 	collection := m.connection.DB(DB_NAME).C(settingtype)
-	_, err := collection.Upsert("key", setting)
+	_, err := collection.Upsert(bson.M{"key": setting.Key}, setting)
 
 	return err
 }
