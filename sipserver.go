@@ -55,7 +55,7 @@ func UDPServer(ip string, port int) {
 		hepMsg, hepErr := hep.NewHepMsg(packet)
 
 		if hepErr != nil {
-			log.Err(hepErr.Error())
+			//log.Info(hepErr.Error())
 			continue
 		}
 
@@ -70,8 +70,8 @@ func UDPServer(ip string, port int) {
 			continue
 		case "NOTIFY":
 			continue
-			// case "REGISTER":
-			// 	continue
+		case "REGISTER":
+			continue
 		}
 
 		if hepMsg.SipMsg.Cseq != nil {
@@ -82,8 +82,8 @@ func UDPServer(ip string, port int) {
 				continue
 			case "NOTIFY":
 				continue
-				// case "REGISTER":
-				// 	continue
+			case "REGISTER":
+				continue
 			}
 		}
 
@@ -100,7 +100,7 @@ func UDPServer(ip string, port int) {
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
-					log.Debug("Sip parser panicked, but I recovered that bitch")
+					log.Debug("Sip parser panicked, but I recovered...")
 				}
 			}()
 			dbObject.Datetime = datetime
