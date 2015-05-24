@@ -8,15 +8,16 @@
  * Controller of the webAngularApp
  */
 angular.module('webAngularApp')
-  .controller('SearchCtrl', function ($scope, $http) {
+  .controller('SearchCtrl', function ($scope, $http, $location) {
     $scope.$parent.curTab = 'search';
+    var searchParams = $location.search();
     $scope.filter = {
-      startDate: '',
-      endDate: '',
-      touser: '',
-      fromuser: '',
-      sourceip: '',
-      destip: ''
+      startDate: searchParams.startDate || '',
+      endDate: searchParams.endDate || '',
+      touser: searchParams.touser || '',
+      fromuser: searchParams.fromuser || '',
+      sourceip: searchParams.sourceip || '',
+      destip: searchParams.destip || ''
     };
 
     var urlBase = "/search?limit=100"
