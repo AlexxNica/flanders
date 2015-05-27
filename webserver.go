@@ -129,6 +129,43 @@ func WebServer(ip string, port int) {
 
 	})
 
+	goji.Get("/call/:id/dump", func(c web.C, w http.ResponseWriter, r *http.Request) {
+		callId := c.URLParams["id"]
+		r.ParseForm()
+
+		ip = r.Form.Get("ip")
+
+		var finalresults db.DbResult
+
+		finalresults = getPacketsByCallId(callId, "")
+
+		sort.Sort(finalresults)
+
+		var dedupresults db.DbResult
+
+		for key, val := range finalresults {
+			if key == 0 || val != finalresults[key-1] {
+				dedupresults = append(dedupresults, val)
+			}
+		}
+
+		var dump string
+
+		for _, packet := range dedupresults {
+			if packet.SourceIp == ip || packet.DestinationIp == ip {
+				dump += "U " + packet.SourceIp + ":" + strconv.Itoa(int(packet.SourcePort)) + " -> " + packet.DestinationIp + ":" + strconv.Itoa(int(packet.DestinationPort)) + "\n"
+				dump += packet.Msg
+				dump += "\n\n"
+			}
+		}
+
+		w.Header().Set("Content-Disposition", "attachment; filename=dump.txt")
+		w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+
+		fmt.Fprintf(w, "%s", dump)
+
+	})
+
 	goji.Get("/ws", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		filter := r.Form.Get("filter")
