@@ -65,8 +65,11 @@ $ vagrant ssh flanders
 Inside the VM, run the app
 
 ```
-vagrant$ cd /opt/go/src/github.com/weave-lab/flanders
-vagrant$ go run main/main.go
+vm$ cd /opt/go/src/github.com/weave-lab/flanders
+vm$ go get github.com/tools/godep
+vm$ godep restore
+vm$ go run main/main.go
+
 ```
 
 When you change the Go code in flanders, it is automatically synced to your virtual machine, so you just have to restart your app to see changes.

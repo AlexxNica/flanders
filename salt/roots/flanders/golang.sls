@@ -22,10 +22,35 @@ gobin:
     - group: vagrant
     - mode: 755
     - makedirs: True
-    - recurse:
-      - user
-      - group
-      - mode
+
+/opt/go/bin:
+  file.directory:
+    - user: vagrant
+    - group: vagrant
+    - mode: 755
+    - makedirs: True
+
+/opt/go/pkg:
+  file.directory:
+    - user: vagrant
+    - group: vagrant
+    - mode: 755
+    - makedirs: True
+
+/opt/go/src:
+  file.directory:
+    - user: vagrant
+    - group: vagrant
+    - mode: 755
+    - makedirs: True
+
+/opt/go/src/github.com:
+  file.directory:
+    - user: vagrant
+    - group: vagrant
+    - mode: 755
+    - makedirs: True
+
 
 go get github.com/tools/godep:
   cmd.run:
