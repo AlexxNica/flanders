@@ -1,18 +1,18 @@
 {
 	"ImportPath": "github.com/weave-lab/flanders",
-	"GoVersion": "go1.3.1",
+	"GoVersion": "go1.5",
 	"Deps": [
 		{
 			"ImportPath": "github.com/dgv/sipparser",
 			"Rev": "0737de446d1b336ad90f501a2e397e868ddcd9a5"
 		},
 		{
-			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "ab5b3a61f5b6aa323d66ece457334396c4ccdd03"
+			"ImportPath": "github.com/goji/param",
+			"Rev": "fb7a99d8b999cd136055575a1226ad8068415407"
 		},
 		{
-			"ImportPath": "github.com/rs/cors",
-			"Rev": "c316ba2160f0e20c86c8c653ab63fc08043fd6d2"
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "ab5b3a61f5b6aa323d66ece457334396c4ccdd03"
 		},
 		{
 			"ImportPath": "github.com/zenazn/goji",
