@@ -6,6 +6,7 @@ import (
 )
 
 var Db DbHandler
+var dbConnectString *string
 
 const (
 	DATEFORMAT = "1/2/2006 3:04:05.000pm (MST)"
@@ -85,6 +86,10 @@ type SettingObject struct {
 
 type SettingResult []SettingObject
 
+// func init() {
+// 	dbConnectString = flag.String("db", "localhost", "Database Connection String")
+// }
+
 func (slice DbResult) Len() int {
 	return len(slice)
 }
@@ -136,6 +141,7 @@ func RegisterHandler(dbHandler DbHandler) {
 	err := Db.Connect("localhost")
 	if err != nil {
 		fmt.Println(err)
+		panic("Could not connect to database...")
 	}
 
 	_ = Db.SetupSchema()

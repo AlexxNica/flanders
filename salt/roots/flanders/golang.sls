@@ -15,3 +15,21 @@ gobin:
   file.append:
     - name: /home/vagrant/.profile
     - text: export PATH=$PATH:/opt/go/bin
+
+/opt/go:
+  file.directory:
+    - user: vagrant
+    - group: vagrant
+    - mode: 755
+    - makedirs: True
+    - recurse:
+      - user
+      - group
+      - mode
+
+go get github.com/tools/godep:
+  cmd.run:
+  - user: vagrant
+  - require:
+    - pkg: go-package
+    
