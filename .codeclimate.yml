@@ -1,4 +1,3 @@
----
 engines:
   csslint:
     enabled: false
@@ -8,11 +7,11 @@ engines:
     enabled: true
   golint:
     enabled: true
-#  duplication:
-#    enabled: true
-#    config:
-#      languages:
-#      - javascript
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
   eslint:
     enabled: false
   fixme:
@@ -24,5 +23,5 @@ ratings:
   - "**.jsx"
   - "**.go"
 exclude_paths:
-- db/
-- Godeps
+- db/**/*
+- Godeps/**/*
