@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 
-	"github.com/weave-lab/flanders"
-	"github.com/weave-lab/flanders/log"
+	"lab.getweave.com/weave/flanders"
+	"lab.getweave.com/weave/flanders/log"
 )
 
 func main() {

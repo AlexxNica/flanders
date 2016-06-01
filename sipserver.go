@@ -1,19 +1,18 @@
 package flanders
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/weave-lab/flanders/db"
-	"github.com/weave-lab/flanders/hep"
-	"github.com/weave-lab/flanders/log"
+	"lab.getweave.com/weave/flanders/db"
+	"lab.getweave.com/weave/flanders/log"
 
 	// Choose your db handler or import your own here
 	// _ "lab.getweave.com/weave/flanders/db/influx"
-	_ "github.com/weave-lab/flanders/db/mongo"
+	_ "lab.getweave.com/weave/flanders/db/mongo"
 )
 
 var h = ListenerHub{
@@ -41,7 +40,6 @@ func UDPServer(ip string, port int) {
 		packet := make([]byte, 4096)
 
 		length, _, err := conn.ReadFromUDP(packet)
-
 		if err != nil {
 			log.Err(err.Error())
 			continue
@@ -49,93 +47,11 @@ func UDPServer(ip string, port int) {
 
 		packet = packet[:length]
 
-		//log.Debug(string(packet))
-		//fmt.Printf("[% 3X]", packet)
-
-		hepMsg, hepErr := hep.NewHepMsg(packet)
-
-		if hepErr != nil {
-			//log.Info(hepErr.Error())
+		err = processPacket(packet)
+		if err != nil {
+			log.Err(fmt.Sprintf("Unable to process packet: %s", err))
 			continue
 		}
-
-		if hepMsg.SipMsg == nil || hepMsg.SipMsg.StartLine == nil {
-			continue
-		}
-
-		switch hepMsg.SipMsg.StartLine.Method {
-		case "OPTIONS":
-			continue
-		case "SUBSCRIBE":
-			continue
-		case "NOTIFY":
-			continue
-		case "REGISTER":
-			continue
-		}
-
-		if hepMsg.SipMsg.Cseq != nil {
-			switch hepMsg.SipMsg.Cseq.Method {
-			case "OPTIONS":
-				continue
-			case "SUBSCRIBE":
-				continue
-			case "NOTIFY":
-				continue
-			case "REGISTER":
-				continue
-			}
-		}
-
-		var datetime time.Time
-
-		//log.Debug(string(packet))
-		if hepMsg.Timestamp != 0 {
-			datetime = time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)
-		} else {
-			datetime = time.Now()
-		}
-
-		dbObject := db.NewDbObject()
-		func() {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Debug("Sip parser panicked, but I recovered...")
-				}
-			}()
-			dbObject.Datetime = datetime
-			dbObject.MicroSeconds = datetime.Nanosecond() / 1000
-			dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.Resp
-			dbObject.ReplyReason = hepMsg.SipMsg.StartLine.RespText
-			dbObject.SourceIp = hepMsg.Ip4SourceAddress
-			dbObject.SourcePort = hepMsg.SourcePort
-			dbObject.DestinationIp = hepMsg.Ip4DestinationAddress
-			dbObject.DestinationPort = hepMsg.DestinationPort
-			dbObject.CallId = hepMsg.SipMsg.CallId
-			dbObject.FromUser = hepMsg.SipMsg.From.URI.User
-			dbObject.FromDomain = hepMsg.SipMsg.From.URI.Host
-			dbObject.FromTag = hepMsg.SipMsg.From.Tag
-			dbObject.ToUser = hepMsg.SipMsg.To.URI.User
-			dbObject.ToDomain = hepMsg.SipMsg.To.URI.Host
-			dbObject.ToTag = hepMsg.SipMsg.To.Tag
-			dbObject.UserAgent = hepMsg.SipMsg.UserAgent
-			dbObject.Cseq = hepMsg.SipMsg.Cseq.Val
-			for _, header := range hepMsg.SipMsg.Headers {
-				if header.Header == "x-cid" {
-					dbObject.CallIdAleg = header.Val
-				}
-			}
-			dbObject.Msg = hepMsg.SipMsg.Msg
-
-			h.broadcast <- *dbObject
-
-			err = dbObject.Save()
-			if err != nil {
-				log.Err(err.Error())
-				return
-			}
-		}()
-
 	}
 }
 

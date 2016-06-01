@@ -1,6 +1,6 @@
 {
-	"ImportPath": "github.com/weave-lab/flanders",
-	"GoVersion": "go1.5",
+	"ImportPath": "lab.getweave.com/weave",
+	"GoVersion": "go1.6",
 	"Deps": [
 		{
 			"ImportPath": "github.com/dgv/sipparser",

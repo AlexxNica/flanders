@@ -6,7 +6,7 @@ import (
 	s "strings"
 
 	"github.com/influxdb/influxdb/client"
-	"github.com/weave-lab/flanders/db"
+	"lab.getweave.com/weave/flanders/db"
 )
 
 const (
