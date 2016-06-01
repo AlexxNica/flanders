@@ -17,6 +17,6 @@ func main() {
 
 	go flanders.UDPServer("0.0.0.0", *sipport)
 	flanders.WebServer("0.0.0.0", *webport)
-	quit := make(chan struct{})
-	<-quit
+
+	select {}
 }
