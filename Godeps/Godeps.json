@@ -1,6 +1,10 @@
 {
-	"ImportPath": "lab.getweave.com/weave",
+	"ImportPath": "lab.getweave.com/weave/flanders",
 	"GoVersion": "go1.6",
+	"GodepVersion": "v69",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/dgv/sipparser",
@@ -8,20 +12,82 @@
 		},
 		{
 			"ImportPath": "github.com/goji/param",
-			"Rev": "fb7a99d8b999cd136055575a1226ad8068415407"
+			"Rev": "da86c81e3e3c23b1948bc7a003d381250a032aa7"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
-			"Rev": "ab5b3a61f5b6aa323d66ece457334396c4ccdd03"
+			"Comment": "v1.0.0",
+			"Rev": "1f512fc3f05332ba7117626cdfb4e07474e58e60"
+		},
+		{
+			"ImportPath": "github.com/influxdata/influxdb/models",
+			"Comment": "v0.13.0-231-g05ec959",
+			"Rev": "05ec9599b7fb37eb37388470d869f557e877a1db"
+		},
+		{
+			"ImportPath": "github.com/influxdata/influxdb/pkg/escape",
+			"Comment": "v0.13.0-231-g05ec959",
+			"Rev": "05ec9599b7fb37eb37388470d869f557e877a1db"
+		},
+		{
+			"ImportPath": "github.com/influxdb/influxdb/client",
+			"Comment": "v0.13.0-231-g05ec959",
+			"Rev": "05ec9599b7fb37eb37388470d869f557e877a1db"
 		},
 		{
 			"ImportPath": "github.com/zenazn/goji",
-			"Comment": "v0.8.1-6-gdcb7f71",
-			"Rev": "dcb7f7169428645921b9914bdd4f61f1b1936564"
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/bind",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/graceful",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/graceful/listener",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/web",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/web/middleware",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/web/mutil",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
 		},
 		{
 			"ImportPath": "gopkg.in/mgo.v2",
-			"Rev": "c9fd3712fbf3e92924c974dce16da2d322508fe2"
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/bson",
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/internal/scram",
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
+		},
+		{
+			"ImportPath": "gopkg.in/mgo.v2/sasl",
+			"Comment": "r2015.01.24",
+			"Rev": "c6a7dce14133ccac2dcac3793f1d6e2ef048503a"
 		}
 	]
 }
