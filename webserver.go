@@ -30,7 +30,7 @@ func init() {
 	flag.StringVar(&assetfolder, "assets", "public", "Static assets folder for GUI")
 }
 
-func WebServer(ip string, port int) {
+func StartWebServer(address string) error {
 
 	goji.Use(CORS)
 
@@ -133,7 +133,7 @@ func WebServer(ip string, port int) {
 		callId := c.URLParams["id"]
 		r.ParseForm()
 
-		ip = r.Form.Get("ip")
+		ip := r.Form.Get("ip")
 
 		var finalresults db.DbResult
 
@@ -276,8 +276,10 @@ func WebServer(ip string, port int) {
 	// })
 
 	goji.Get("/*", http.FileServer(http.Dir(assetfolder)))
-	flag.Set("bind", ip+":"+strconv.Itoa(port))
-	goji.Serve()
+	flag.Set("bind", address)
+	go goji.Serve()
+
+	return nil
 }
 
 func getPacketsByCallId(callId string, excludeCallId string) db.DbResult {

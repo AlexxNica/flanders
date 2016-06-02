@@ -40,7 +40,8 @@ var stringLevelMap = map[string]syslog.Priority{
 }
 
 func init() {
-	if runtime.GOOS == "linux" {
+	switch runtime.GOOS {
+	case "linux", "darwin":
 		err := setupDefaultLogger()
 		if err != nil {
 			panic("Cannot setup the default logger to syslog")

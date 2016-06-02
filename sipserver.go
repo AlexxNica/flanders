@@ -4,15 +4,10 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strconv"
 	"strings"
 
 	"lab.getweave.com/weave/flanders/db"
 	"lab.getweave.com/weave/flanders/log"
-
-	// Choose your db handler or import your own here
-	// _ "lab.getweave.com/weave/flanders/db/influx"
-	_ "lab.getweave.com/weave/flanders/db/mongo"
 )
 
 var h = ListenerHub{
@@ -22,37 +17,44 @@ var h = ListenerHub{
 	connections: make(map[*Listener]bool),
 }
 
-func UDPServer(ip string, port int) {
-	go h.run()
-	addr := net.UDPAddr{
-		Port: port,
-		IP:   net.ParseIP(ip),
+func StartSIPServer(address string) error {
+
+	addr, err := net.ResolveUDPAddr("udp", address)
+	if err != nil {
+		return err
 	}
-	log.Info("Flanders server listening on " + ip + ":" + strconv.Itoa(port))
-	conn, err := net.ListenUDP("udp", &addr)
+
+	log.Info("Flanders server listening on " + addr.String())
+	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
 		log.Crit(err.Error())
 		os.Exit(1)
 	}
-	defer conn.Close()
 
-	for {
-		packet := make([]byte, 4096)
+	go func() {
+		for {
+			packet := make([]byte, 4096)
 
-		length, _, err := conn.ReadFromUDP(packet)
-		if err != nil {
-			log.Err(err.Error())
-			continue
+			length, _, err := conn.ReadFromUDP(packet)
+			if err != nil {
+				log.Err(err.Error())
+				continue
+			}
+
+			packet = packet[:length]
+
+			err = processPacket(packet)
+			if err != nil {
+				log.Err(fmt.Sprintf("Unable to process packet: %s", err))
+				continue
+			}
 		}
 
-		packet = packet[:length]
+		conn.Close()
 
-		err = processPacket(packet)
-		if err != nil {
-			log.Err(fmt.Sprintf("Unable to process packet: %s", err))
-			continue
-		}
-	}
+	}()
+
+	return nil
 }
 
 type Listener struct {

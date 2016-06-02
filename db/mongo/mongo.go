@@ -21,7 +21,7 @@ type MongoDb struct {
 
 func init() {
 	newMongoHandler := &MongoDb{}
-	db.RegisterHandler(newMongoHandler)
+	db.RegisterHandler("mongo", newMongoHandler)
 }
 
 func (m *MongoDb) Connect(connectString string) error {

@@ -2,21 +2,30 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"os"
 
 	"lab.getweave.com/weave/flanders"
 	"lab.getweave.com/weave/flanders/log"
 )
 
 func main() {
-	webport := flag.Int("webport", 8000, "Web server port")
-	sipport := flag.Int("sipport", 9060, "SIP server port")
+	webPort := flag.String("webport", "8000", "Web server port")
+	sipPort := flag.String("sipport", "9060", "SIP server port")
+	dbAddress := flag.String("db", "localhost", "DB address")
+
 	loglevel := flag.String("loglevel", "warn", "Log level")
 	flag.Parse()
 	//log.SetLogger(os.Stdout)
 	log.SetLogLevel(*loglevel)
 
-	go flanders.UDPServer("0.0.0.0", *sipport)
-	flanders.WebServer("0.0.0.0", *webport)
+	webAddress := "0.0.0.0:" + *webPort
+	sipAddress := "0.0.0.0:" + *sipPort
 
-	select {}
+	err := flanders.Run(sipAddress, webAddress, *dbAddress)
+	if err != nil {
+		fmt.Println(err)
+		log.Crit(err.Error())
+		os.Exit(1)
+	}
 }

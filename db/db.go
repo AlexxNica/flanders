@@ -136,15 +136,31 @@ type DbHandler interface {
 	DeleteSetting(settingtype string, key string) error
 }
 
-func RegisterHandler(dbHandler DbHandler) {
-	Db = dbHandler
-	err := Db.Connect("localhost")
-	if err != nil {
-		fmt.Println(err)
-		panic("Could not connect to database...")
+var dbs = make(map[string]DbHandler)
+
+func RegisterHandler(name string, dbHandler DbHandler) {
+	dbs[name] = dbHandler
+}
+
+func Setup(name string, address string) error {
+
+	var ok bool
+	Db, ok = dbs[name]
+	if !ok {
+		return fmt.Errorf("unknown db: %s", name)
 	}
 
-	_ = Db.SetupSchema()
+	err := Db.Connect(address)
+	if err != nil {
+		return fmt.Errorf("unable to connect to db at %s: %s", address, err)
+	}
+
+	err = Db.SetupSchema()
+	if err != nil {
+		return fmt.Errorf("unable to setup db: %s", err)
+	}
+
+	return nil
 }
 
 func NewDbObject() *DbObject {
