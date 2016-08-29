@@ -1,0 +1,28 @@
+---
+engines:
+  csslint:
+    enabled: false
+  gofmt:
+    enabled: true
+  govet:
+    enabled: true
+  golint:
+    enabled: true
+#  duplication:
+#    enabled: true
+#    config:
+#      languages:
+#      - javascript
+  eslint:
+    enabled: false
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - "**.css"
+  - "**.js"
+  - "**.jsx"
+  - "**.go"
+exclude_paths:
+- db/
+- Godeps
