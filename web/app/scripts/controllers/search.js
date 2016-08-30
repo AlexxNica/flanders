@@ -17,7 +17,8 @@ angular.module('webAngularApp')
       touser: searchParams.touser || '',
       fromuser: searchParams.fromuser || '',
       sourceip: searchParams.sourceip || '',
-      destip: searchParams.destip || ''
+      destip: searchParams.destip || '',
+      callId: searchParams.callId || ''
     };
 
     var urlBase = "/search?limit=100"

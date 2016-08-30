@@ -23,12 +23,14 @@
         </div>
         <div class="col-md-2">
           <label>To User</label>
-          <input type="text"
+          <button type="button" id="button">+1</button>
+          <input type="text" id="text"
            class="form-control"
            ng-model="filter.touser"
             />
           <label>From User</label>
-          <input type="text"
+          <button type="button" id="button">+1</button>
+          <input type="text" id="text"
            class="form-control"
            ng-model="filter.fromuser"
             />
@@ -45,6 +47,13 @@
            ng-model="filter.destip"
             />
         </div>
+        <div class="col-md-2">
+          <label>Call ID</label>
+          <input type="text"
+                 class="form-control"
+                 ng-model="filter.callid"
+          />
+        </div>
       </div>
       <p></p>
       <button type="submit" ng-click="search()" class="btn btn-primary">Search</button>
@@ -52,8 +61,8 @@
   </form>
 </div>
 
-  
-  
+
+
 
 <table class="table table-hover">
   <thead>
