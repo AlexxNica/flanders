@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"gopkg.in/mgo.v2"
+	"github.com/weave-lab/flanders/db"
+	"github.com/weave-lab/flanders/vendor/gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"lab.getweave.com/weave/flanders/db"
 )
 
 const (

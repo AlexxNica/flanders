@@ -3,11 +3,11 @@ package flanders
 import (
 	"fmt"
 
-	"lab.getweave.com/weave/flanders/db"
+	"github.com/weave-lab/flanders/db"
 
 	// Choose your db handler or import your own here
 	// _ "lab.getweave.com/weave/flanders/db/influx"
-	_ "lab.getweave.com/weave/flanders/db/mongo"
+	_ "github.com/weave-lab/flanders/db/mongo"
 )
 
 func Run(sipAddress string, webAddress string, dbAddress string) error {
