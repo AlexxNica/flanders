@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"lab.getweave.com/weave/flanders"
-	"lab.getweave.com/weave/flanders/log"
+	"github.com/weave-lab/flanders"
+	"github.com/weave-lab/flanders/log"
 )
 
 func main() {

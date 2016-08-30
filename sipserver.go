@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"lab.getweave.com/weave/flanders/db"
-	"lab.getweave.com/weave/flanders/log"
+	"github.com/weave-lab/flanders/db"
+	"github.com/weave-lab/flanders/log"
 )
 
 var h = ListenerHub{

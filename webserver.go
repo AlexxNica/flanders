@@ -10,10 +10,10 @@ import (
 
 	"github.com/goji/param"
 	"github.com/gorilla/websocket"
+	"github.com/weave-lab/flanders/db"
+	"github.com/weave-lab/flanders/log"
 	"github.com/zenazn/goji"
 	"github.com/zenazn/goji/web"
-	"lab.getweave.com/weave/flanders/db"
-	"lab.getweave.com/weave/flanders/log"
 )
 
 var upgrader = websocket.Upgrader{

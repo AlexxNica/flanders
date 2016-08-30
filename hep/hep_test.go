@@ -1,8 +1,6 @@
 package hep
 
-import (
-	"testing"
-)
+import "testing"
 
 /**
 * Naive HEP3 message parse test...

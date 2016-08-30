@@ -7,7 +7,6 @@ package hep
 import (
 	"encoding/binary"
 	"errors"
-	//"lab.getweave.com/weave/flanders/sip"
 	"net"
 
 	"github.com/dgv/sipparser"

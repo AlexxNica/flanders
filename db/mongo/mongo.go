@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/weave-lab/flanders/db"
-	"github.com/weave-lab/flanders/vendor/gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
