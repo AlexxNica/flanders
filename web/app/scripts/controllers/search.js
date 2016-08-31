@@ -21,7 +21,7 @@ angular.module('webAngularApp')
       callId: searchParams.callId || ''
     };
 
-    var urlBase = "/search?limit=100"
+    var urlBase = "/search?limit=100";
 
     $scope.search = function() {
       var url = urlBase;
@@ -47,8 +47,19 @@ angular.module('webAngularApp')
           // called asynchronously if an error occurs
           // or server returns response with an error status.
         });
-    }
+    };
 
     $scope.search();
 
+    $scope.insertPlusOne = function() {
+      //Adding the string for +1 into text field by button click.
+      $(function () {
+        $('#button').on('click', function () {
+          var text = $('#text');
+          text.val(text.val() + '%2b1');
+        });
+      });
+    };
+
+    $scope.insertPlusOne();
   });
