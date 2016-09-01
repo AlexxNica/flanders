@@ -51,15 +51,27 @@ angular.module('webAngularApp')
 
     $scope.search();
 
-    $scope.insertPlusOne = function() {
+    $scope.insertPlusOneTo = function() {
       //Adding the string for +1 into text field by button click.
       $(function () {
-        $('#button').on('click', function () {
-          var text = $('#text');
-          text.val(text.val() + '%2b1');
+        $('#button1').on('click', function () {
+          var text = $('#text1');
+          text.val('%2b1');
         });
       });
     };
 
-    $scope.insertPlusOne();
+    $scope.insertPlusOneTo();
+
+    $scope.insertPlusOneFrom = function() {
+      //Adding the string for +1 into text field by button click.
+      $(function () {
+        $('#button2').on('click', function () {
+          var text = $('#text2');
+          text.val('%2b1');
+        });
+      });
+    };
+
+    $scope.insertPlusOneFrom();
   });
