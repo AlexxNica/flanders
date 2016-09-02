@@ -11,6 +11,7 @@
            data-date-time-picker
            data-language="{{en}}"
            data-pick12HourFormat="false"
+           placeholder="Click to select date"
             />
           <label>End Date</label>
           <input type="text"
@@ -19,23 +20,28 @@
            data-date-time-picker
            data-language="{{en}}"
            data-pick12HourFormat="false"
+           placeholder="Click to select date"
             />
         </div>
         <div class="col-md-2">
           <label>To User</label>
-          <button type="button" id="button1" ng-click="insertPlusOneTo()">+1</button>
+          <div class="button-input">
+          <button type="button" id="button1" class="btn btn-primary" ng-click="insertPlusOneTo()">+1</button>
           <input type="text" id="text1"
            class="form-control"
            ng-model="filter.touser"
            placeholder="Enter DID..."
             />
+          </div>
           <label>From User</label>
-          <button type="button" id="button2" ng-click="insertPlusOneFrom()">+1</button>
+          <div class="button-input">
+          <button type="button" id="button2" class="btn btn-primary" ng-click="insertPlusOneFrom()">+1</button>
           <input type="text" id="text2"
            class="form-control"
            ng-model="filter.fromuser"
            placeholder="Enter DID..."
             />
+          </div>
         </div>
         <div class="col-md-2">
           <label>Source IP</label>
