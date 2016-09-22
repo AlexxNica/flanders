@@ -28,6 +28,7 @@ func (m *MysqlDB) Connect(connectString string) error {
 	return err
 }
 
+// Insert adds a new record to the messages table in mysql
 func (m *MysqlDB) Insert(dbObject *db.DbObject) error {
 	message := &models.Message{}
 	message.Date = dbObject.Datetime
@@ -35,9 +36,9 @@ func (m *MysqlDB) Insert(dbObject *db.DbObject) error {
 	message.Method = dbObject.Method
 	message.ReplyReason = dbObject.ReplyReason
 	message.SourceIp = dbObject.SourceIp
-	message.SourcePort = dbObject.SourcePort
+	message.SourcePort = int(dbObject.SourcePort)
 	message.DestinationIp = dbObject.DestinationIp
-	message.DestinationPort = dbObject.DestinationPort
+	message.DestinationPort = int(dbObject.DestinationPort)
 	message.Callid = dbObject.CallId
 	message.FromUser = dbObject.FromUser
 	message.FromDomain = dbObject.FromDomain
