@@ -106,6 +106,10 @@ func (slice DbResult) Swap(i, j int) {
 	slice[i], slice[j] = slice[j], slice[i]
 }
 
+func (slice *DbResult) Append(dbObject *DbObject) {
+	*slice = append(*slice, *dbObject)
+}
+
 type Filter struct {
 	StartDate string
 	EndDate   string
