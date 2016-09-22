@@ -31,7 +31,7 @@ func init() {
 	flag.StringVar(&assetfolder, "assets", "public", "Static assets folder for GUI")
 }
 
-func StartWebServer(address string) error {
+func StartWebServer(address string, assetfolder string) error {
 
 	goji.Use(CORS)
 

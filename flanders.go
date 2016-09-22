@@ -21,6 +21,7 @@ func main() {
 	sipPort := flag.String("sipport", "9060", "SIP server port")
 	dbDriver := flag.String("driver", "mongo", "db driver (mysql|mongo|influx)")
 	dbConnectString := flag.String("db", "localhost", "DB connect string")
+	assetFolder := flag.String("assets", "public", "Static assets folder for GUI")
 	finish := make(chan struct{})
 
 	loglevel := flag.String("loglevel", "warn", "Log level")
@@ -43,7 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = api.StartWebServer(webAddress)
+	err = api.StartWebServer(webAddress, *assetFolder)
 	if err != nil {
 		fmt.Printf("unable to start web server: %s", err)
 		os.Exit(1)
