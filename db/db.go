@@ -121,8 +121,9 @@ func NewFilter() Filter {
 }
 
 type Options struct {
-	Sort  []string
-	Limit int
+	Sort     []string
+	Limit    int
+	Distinct string
 }
 
 type DbHandler interface {

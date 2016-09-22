@@ -1,33 +1,51 @@
-package flanders
+package main
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
+	"github.com/weave-lab/flanders/api"
+	"github.com/weave-lab/flanders/capture"
 	"github.com/weave-lab/flanders/db"
+	"github.com/weave-lab/flanders/log"
 
-	// Choose your db handler or import your own here
+	// Import all DB handlers, use config to select which one
 	// _ "lab.getweave.com/weave/flanders/db/influx"
 	_ "github.com/weave-lab/flanders/db/mongo"
+	_ "github.com/weave-lab/flanders/db/mysql"
 )
 
-func Run(sipAddress string, webAddress string, dbAddress string) error {
+func main() {
+	webPort := flag.String("webport", "8000", "Web server port")
+	sipPort := flag.String("sipport", "9060", "SIP server port")
+	dbDriver := flag.String("driver", "mongo", "db driver (mysql|mongo|influx)")
+	dbConnectString := flag.String("db", "localhost", "DB connect string")
 
-	err := db.Setup("mongo", dbAddress)
+	loglevel := flag.String("loglevel", "warn", "Log level")
+	flag.Parse()
+	//log.SetLogger(os.Stdout)
+	log.SetLogLevel(*loglevel)
+
+	webAddress := "0.0.0.0:" + *webPort
+	sipAddress := "0.0.0.0:" + *sipPort
+
+	err := db.Setup(*dbDriver, *dbConnectString)
 	if err != nil {
-		return fmt.Errorf("unable to connect to db: %s", err)
+		fmt.Printf("\nunable to connect to db: %s", err)
+		os.Exit(1)
 	}
 
-	go h.run()
-
-	err = StartSIPServer(sipAddress)
+	err = capture.StartSIPCaptureServer(sipAddress)
 	if err != nil {
-		return fmt.Errorf("unable to start sip listener: %s", err)
+		fmt.Printf("unable to start sip listener: %s", err)
+		os.Exit(1)
 	}
 
-	err = StartWebServer(webAddress)
+	err = api.StartWebServer(webAddress)
 	if err != nil {
-		return fmt.Errorf("unable to start web server: %s", err)
+		fmt.Printf("unable to start web server: %s", err)
+		os.Exit(1)
 	}
 
-	select {}
 }

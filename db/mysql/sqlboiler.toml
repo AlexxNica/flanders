@@ -1,0 +1,7 @@
+[mysql]
+dbname="sipcapture"
+host="104.197.97.42"
+port=3306
+user="root"
+pass="usqsi/V7vHXKc9"
+sslmode="false"

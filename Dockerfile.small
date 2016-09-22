@@ -1,3 +1,0 @@
-FROM gliderlabs/alpine
-ADD bin/flanders /
-CMD ["/flanders"]

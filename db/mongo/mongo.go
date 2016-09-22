@@ -86,12 +86,9 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 		query = query.Sort("-datetime")
 	}
 
-	//sort := options.Sort
-
-	// if sort != nil {
-	// 	query = query.Sort(...sort)
-	// } else {
-	// 	query = query.Sort("Timestamp")
+	// if options.Distinct != "" {
+	// 	query.Distinct(options.Distinct, result)
+	// 	return nil
 	// }
 
 	query.All(result)
