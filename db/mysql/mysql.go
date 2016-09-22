@@ -3,6 +3,7 @@ package mysql
 import (
 	"database/sql"
 
+	_ "github.com/go-sql-driver/mysql" // Loading mysql driver for this database connection
 	"github.com/weave-lab/flanders/db"
 )
 
