@@ -42,7 +42,8 @@ func (m *MongoDb) Insert(dbObject *db.DbObject) error {
 	return err
 }
 
-func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResult) error {
+func (m *MongoDb) Find(filter *db.Filter, options *db.Options) (db.DbResult, error) {
+	var result db.DbResult
 	collection := m.connection.DB(DB_NAME).C("message")
 
 	conditions := bson.M{}
@@ -54,7 +55,7 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 		fmt.Print("Start date found... " + filter.StartDate)
 		startDate, err = time.Parse(time.RFC3339, filter.StartDate)
 		if err != nil {
-			return errors.New("Could not parse `Start Date` from filters")
+			return nil, errors.New("Could not parse `Start Date` from filters")
 		}
 		conditions["datetime"] = bson.M{"$gte": startDate}
 	}
@@ -62,7 +63,7 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 		fmt.Print("End date found... " + filter.EndDate)
 		endDate, err = time.Parse(time.RFC3339, filter.EndDate)
 		if err != nil {
-			return errors.New("Could not parse `End Date` from filters")
+			return nil, errors.New("Could not parse `End Date` from filters")
 		}
 		conditions["datetime"] = bson.M{"$lt": endDate}
 	}
@@ -91,32 +92,43 @@ func (m *MongoDb) Find(filter *db.Filter, options *db.Options, result *db.DbResu
 	// 	return nil
 	// }
 
-	query.All(result)
+	query.All(&result)
 
-	return nil
+	return result, nil
 }
 
-func (m *MongoDb) GetSettings(settingtype string, result *db.SettingResult) error {
+func (m *MongoDb) GetSettings(settingtype string) (db.SettingResult, error) {
 	collection := m.connection.DB(DB_NAME).C(settingtype)
 
 	query := collection.Find(bson.M{})
-	query.All(result)
 
-	return nil
+	var result db.SettingResult
+	err := query.All(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (m *MongoDb) SetSetting(settingtype string, setting db.SettingObject) error {
 	collection := m.connection.DB(DB_NAME).C(settingtype)
 	_, err := collection.Upsert(bson.M{"key": setting.Key}, setting)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func (m *MongoDb) DeleteSetting(settingtype string, key string) error {
 	collection := m.connection.DB(DB_NAME).C(settingtype)
 	err := collection.Remove(bson.M{"key": key})
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func (m *MongoDb) CheckSchema() error {
