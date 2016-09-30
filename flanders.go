@@ -19,10 +19,9 @@ import (
 func main() {
 	webPort := flag.String("webport", "8000", "Web server port")
 	sipPort := flag.String("sipport", "9060", "SIP server port")
-	dbDriver := flag.String("driver", "mongo", "db driver (mysql|mongo|influx)")
 	dbConnectString := flag.String("db", "localhost", "DB connect string")
+	dbDriver := flag.String("driver", "mongo", "db driver (mysql|mongo|influx)")
 	assetFolder := flag.String("assets", "public", "Static assets folder for GUI")
-	finish := make(chan struct{})
 
 	loglevel := flag.String("loglevel", "warn", "Log level")
 	flag.Parse()
@@ -34,7 +33,7 @@ func main() {
 
 	err := db.Setup(*dbDriver, *dbConnectString)
 	if err != nil {
-		fmt.Printf("\nunable to connect to db: %s", err)
+		fmt.Printf("\nunable to connect to db: %s\nn", err)
 		os.Exit(1)
 	}
 
@@ -44,10 +43,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	// This blocks so do last
 	err = api.StartWebServer(webAddress, *assetFolder)
 	if err != nil {
 		fmt.Printf("unable to start web server: %s", err)
 		os.Exit(1)
 	}
-	<-finish
 }

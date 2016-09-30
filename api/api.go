@@ -25,12 +25,6 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var assetfolder string
-
-func init() {
-	flag.StringVar(&assetfolder, "assets", "public", "Static assets folder for GUI")
-}
-
 func StartWebServer(address string, assetfolder string) error {
 
 	goji.Use(CORS)
@@ -278,7 +272,7 @@ func StartWebServer(address string, assetfolder string) error {
 
 	goji.Get("/*", http.FileServer(http.Dir(assetfolder)))
 	flag.Set("bind", address)
-	go goji.Serve()
+	goji.Serve()
 
 	return nil
 }
