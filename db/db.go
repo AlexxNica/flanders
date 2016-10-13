@@ -133,10 +133,10 @@ type Options struct {
 type DbHandler interface {
 	Connect(connectString string) error
 	Insert(dbObject *DbObject) error
-	Find(filter *Filter, options *Options, result *DbResult) error
+	Find(filter *Filter, options *Options) (DbResult, error)
 	CheckSchema() error // Check to see if the database has been setup or not. Returns nil if all is well
 	SetupSchema() error // Sets up the database schema. This will delete all data!!!
-	GetSettings(settingtype string, result *SettingResult) error
+	GetSettings(settingtype string) (SettingResult, error)
 	SetSetting(settingtype string, setting SettingObject) error
 	DeleteSetting(settingtype string, key string) error
 }
