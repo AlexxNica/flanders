@@ -25,12 +25,6 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var assetfolder string
-
-func init() {
-	flag.StringVar(&assetfolder, "assets", "public", "Static assets folder for GUI")
-}
-
 func StartWebServer(address string, assetfolder string) error {
 
 	goji.Use(CORS)
@@ -90,9 +84,11 @@ func StartWebServer(address string, assetfolder string) error {
 			options.Sort = order
 		}
 
-		var results db.DbResult
-
-		db.Db.Find(&filter, options, &results)
+		results, err := db.Db.Find(&filter, options)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		//fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
@@ -104,29 +100,30 @@ func StartWebServer(address string, assetfolder string) error {
 	})
 
 	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
-		callId := c.URLParams["id"]
+		callID := c.URLParams["id"]
 
-		var finalresults db.DbResult
-
-		finalresults = getPacketsByCallId(callId, "")
-
-		sort.Sort(finalresults)
-
-		var dedupresults db.DbResult
-
-		for key, val := range finalresults {
-			if key == 0 || val != finalresults[key-1] {
-				dedupresults = append(dedupresults, val)
-			}
-		}
-
-		jsonResults, err := json.Marshal(dedupresults)
+		dbResults, err := packetsByCallID(callID, "")
 		if err != nil {
-			fmt.Fprint(w, err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		fmt.Fprintf(w, "%s", string(jsonResults))
+		sort.Sort(dbResults)
+
+		var results db.DbResult
+
+		for key, val := range dbResults {
+			if key == 0 || val != dbResults[key-1] {
+				results = append(results, val)
+			}
+		}
+
+		enc := json.NewEncoder(w)
+		err = enc.Encode(results)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 	})
 
@@ -136,23 +133,25 @@ func StartWebServer(address string, assetfolder string) error {
 
 		ip := r.Form.Get("ip")
 
-		var finalresults db.DbResult
+		finalResults, err := packetsByCallID(callId, "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-		finalresults = getPacketsByCallId(callId, "")
+		sort.Sort(finalResults)
 
-		sort.Sort(finalresults)
+		dedupResults := make(db.DbResult, 0, len(finalResults))
 
-		var dedupresults db.DbResult
-
-		for key, val := range finalresults {
-			if key == 0 || val != finalresults[key-1] {
-				dedupresults = append(dedupresults, val)
+		for key, val := range finalResults {
+			if key == 0 || val != finalResults[key-1] {
+				dedupResults = append(dedupResults, val)
 			}
 		}
 
 		var dump string
 
-		for _, packet := range dedupresults {
+		for _, packet := range dedupResults {
 			if packet.SourceIp == ip || packet.DestinationIp == ip {
 				dump += "U " + packet.SourceIp + ":" + strconv.Itoa(int(packet.SourcePort)) + " -> " + packet.DestinationIp + ":" + strconv.Itoa(int(packet.DestinationPort)) + "\n"
 				dump += packet.Msg
@@ -200,8 +199,12 @@ func StartWebServer(address string, assetfolder string) error {
 
 	goji.Get("/settings/:group", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		group := c.URLParams["group"]
-		var results db.SettingResult
-		db.Db.GetSettings(group, &results)
+
+		results, err := db.Db.GetSettings(group)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
@@ -278,20 +281,20 @@ func StartWebServer(address string, assetfolder string) error {
 
 	goji.Get("/*", http.FileServer(http.Dir(assetfolder)))
 	flag.Set("bind", address)
-	go goji.Serve()
+	goji.Serve()
 
 	return nil
 }
 
-func getPacketsByCallId(callId string, excludeCallId string) db.DbResult {
+func packetsByCallID(callID string, excludeCallID string) (db.DbResult, error) {
 	var results db.DbResult
 	filter := db.NewFilter()
 	options := &db.Options{}
 	callIdMap := make(map[string]interface{})
 	callIdALegMap := make(map[string]interface{})
 
-	callIdMap["callid"] = callId
-	callIdALegMap["callidaleg"] = callId
+	callIdMap["callid"] = callID
+	callIdALegMap["callidaleg"] = callID
 
 	filter.Equals["$or"] = []interface{}{
 		callIdMap,
@@ -300,24 +303,33 @@ func getPacketsByCallId(callId string, excludeCallId string) db.DbResult {
 
 	options.Sort = append(options.Sort, "datetime")
 	options.Sort = append(options.Sort, "microseconds")
-	db.Db.Find(&filter, options, &results)
+	results, err := db.Db.Find(&filter, options)
+	if err != nil {
+		return nil, err
+	}
+
 	altCallIds := make(map[string]bool)
 	for _, msg := range results {
-		if excludeCallId != "" && msg.CallIdAleg == excludeCallId {
+		if excludeCallID != "" && msg.CallIdAleg == excludeCallID {
 			continue
 		}
-		if msg.CallId != callId {
+		if msg.CallId != callID {
 			_, ok := altCallIds[msg.CallId]
 			if !ok {
 				altCallIds[msg.CallId] = true
 			}
 		}
 	}
-	for newCallId, _ := range altCallIds {
-		results = append(results, getPacketsByCallId(newCallId, callId)...)
+	for newCallID, _ := range altCallIds {
+		p, err := packetsByCallID(newCallID, callID)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, p...)
 	}
 
-	return results
+	return results, nil
 }
 
 func CORS(h http.Handler) http.Handler {
