@@ -77,21 +77,23 @@ func StartWebServer(address string, assetfolder string) error {
 			}
 		}
 
-		order := r.Form["orderby"]
+/*		order := r.Form["orderby"]
 		if len(order) == 0 {
 			options.Sort = append(options.Sort, "-datetime")
 		} else {
 			options.Sort = order
-		}
+		}*/
 
 		results, err := db.Db.Find(&filter, options)
 		if err != nil {
+			fmt.Printf("HERE 000000000 %+v\n", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		//fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
+			fmt.Printf("HERE 000000001 %+v\n", err.Error())
 			fmt.Fprint(w, err)
 			return
 		}

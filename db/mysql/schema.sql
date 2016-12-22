@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS `sipcapture`; /*!40100 DEFAULT CHARACTER SET utf8 
 
 USE sipcapture;
 
-CREATE TABLE IF NOT EXISTS `message` (
+CREATE TABLE IF NOT EXISTS `messages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `micro_ts` bigint(18) NOT NULL DEFAULT '0',

@@ -38,7 +38,7 @@ func (m *MySQL) Connect(connectString string) error {
 }
 
 func (m *MySQL) CheckSchema() error {
-	rows, err := m.db.Query(`SELECT count(*) FROM message`)
+	rows, err := m.db.Query(`SELECT count(*) FROM messages`)
 	if err != nil {
 		return err
 	}

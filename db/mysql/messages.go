@@ -9,8 +9,8 @@ import (
 
 func (m *MySQL) prepareInsertQuery() error {
 
-	q := `INSERT INTO message (
-			date, micro_ts, 
+	q := `INSERT INTO messages (
+			date, micro_ts,
 			method, reply_reason, ruri,
   			ruri_user, ruri_domain,
   			from_user, from_domain, from_tag,
@@ -24,7 +24,7 @@ func (m *MySQL) prepareInsertQuery() error {
 			source_ip, source_port,
   			destination_ip, destination_port,
   			contact_ip, contact_port,
-  			originator_ip, originator_port, 
+  			originator_ip, originator_port,
   			proto, family, rtp_stat,
   			type, node, msg
 		)
@@ -73,7 +73,7 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 	return nil
 }
 
-const columns = `date, micro_ts, 
+const columns = `date, micro_ts,
 			method, reply_reason, ruri,
   			ruri_user, ruri_domain,
   			from_user, from_domain, from_tag,
@@ -87,7 +87,7 @@ const columns = `date, micro_ts,
 			source_ip, source_port,
   			destination_ip, destination_port,
   			contact_ip, contact_port,
-  			originator_ip, originator_port, 
+  			originator_ip, originator_port,
   			proto, family, rtp_stat,
   			type, node, msg`
 
