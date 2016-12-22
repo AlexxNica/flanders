@@ -148,23 +148,19 @@ func RegisterHandler(name string, dbHandler DbHandler) {
 }
 
 func Setup(name string, address string) error {
-
 	var ok bool
 	Db, ok = dbs[name]
 	if !ok {
 		return fmt.Errorf("unknown db: %s", name)
 	}
-
 	err := Db.Connect(address)
 	if err != nil {
 		return fmt.Errorf("unable to connect to db at %s: %s", address, err)
 	}
-
-	err = Db.SetupSchema()
+	err = Db.CheckSchema()
 	if err != nil {
 		return fmt.Errorf("unable to setup db: %s", err)
 	}
-
 	return nil
 }
 

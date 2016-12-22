@@ -38,7 +38,7 @@ func (m *MySQL) Connect(connectString string) error {
 }
 
 func (m *MySQL) CheckSchema() error {
-	rows, err := m.db.Query(`SELECT 1 FROM message`)
+	rows, err := m.db.Query(`SELECT count(*) FROM message`)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,6 @@ func (m *MySQL) CheckSchema() error {
 	for rows.Next() {
 		return nil
 	}
-
 	return fmt.Errorf("schema not found")
 }
 

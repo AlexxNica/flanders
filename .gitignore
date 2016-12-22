@@ -10,6 +10,8 @@ bin/
 *.a
 *.so
 
+run-notes.txt
+
 # Folders
 _obj
 _test
