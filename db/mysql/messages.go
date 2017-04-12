@@ -156,7 +156,7 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 	for i, v := range options.Sort {
 		dir := " ASC"
 		if strings.HasPrefix(v, "-") {
-			strings.TrimPrefix(v, "-")
+			v = strings.TrimPrefix(v, "-")
 			dir = " DESC"
 		}
 

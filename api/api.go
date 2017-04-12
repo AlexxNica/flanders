@@ -34,13 +34,14 @@ func StartWebServer(address string, assetfolder string) error {
 		options := &db.Options{}
 
 		r.ParseForm()
-		startDate := r.Form.Get("startDate")
-		endDate := r.Form.Get("endDate")
-		limit := r.Form.Get("limit")
-		touser := r.Form.Get("touser")
-		fromuser := r.Form.Get("fromuser")
-		sourceip := r.Form.Get("sourceip")
-		destip := r.Form.Get("destip")
+		form := sanatizedForm(r.Form)
+		startDate := form.Get("startdate")
+		endDate := form.Get("enddate")
+		limit := form.Get("limit")
+		touser := form.Get("touser")
+		fromuser := form.Get("fromuser")
+		sourceip := form.Get("sourceip")
+		destip := form.Get("destip")
 
 		if startDate != "" {
 			filter.StartDate = startDate
@@ -77,20 +78,18 @@ func StartWebServer(address string, assetfolder string) error {
 			}
 		}
 
-		/*
-			order := r.Form["orderby"]
-			if len(order) == 0 {
-				options.Sort = append(options.Sort, "-datetime")
-			} else {
-				options.Sort = order
-			}
-		*/
+		order := form["orderby"]
+		if len(order) == 0 {
+			options.Sort = append(options.Sort, "-datetime")
+		} else {
+			options.Sort = order
+		}
+
 		results, err := db.Db.Find(&filter, options)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		//fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)
