@@ -77,13 +77,14 @@ func StartWebServer(address string, assetfolder string) error {
 			}
 		}
 
-/*		order := r.Form["orderby"]
-		if len(order) == 0 {
-			options.Sort = append(options.Sort, "-datetime")
-		} else {
-			options.Sort = order
-		}*/
-
+		/*
+			order := r.Form["orderby"]
+			if len(order) == 0 {
+				options.Sort = append(options.Sort, "-datetime")
+			} else {
+				options.Sort = order
+			}
+		*/
 		results, err := db.Db.Find(&filter, options)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
