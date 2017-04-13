@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+const requestDateFormat = "01/02/2006 3:04 PM"
+
 func sanatizedForm(f url.Values) url.Values {
 	var sanatized = make(url.Values)
 	for k, values := range f {

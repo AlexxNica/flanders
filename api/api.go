@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strconv"
 
+	"time"
+
 	"github.com/goji/param"
 	"github.com/gorilla/websocket"
 	"github.com/weave-lab/flanders/capture"
@@ -43,19 +45,29 @@ func StartWebServer(address string, assetfolder string) error {
 		destip := form.Get("destip")
 
 		if startDate != "" {
-			filter.StartDate = startDate
+			d, err := time.Parse(requestDateFormat, startDate)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			filter.StartDate = d.Format(time.RFC3339)
 		}
 
 		if endDate != "" {
-			filter.EndDate = endDate
+			d, err := time.Parse(requestDateFormat, endDate)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			filter.EndDate = d.Format(time.RFC3339)
 		}
 
 		if touser != "" {
-			filter.Equals["touser"] = touser
+			filter.Like["touser"] = touser
 		}
 
 		if fromuser != "" {
-			filter.Equals["fromuser"] = fromuser
+			filter.Like["fromuser"] = fromuser
 		}
 
 		if sourceip != "" {
