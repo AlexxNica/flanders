@@ -4,7 +4,7 @@ import "github.com/weave-lab/flanders/db"
 
 func (m *MySQL) GetSettings(t string) (db.SettingResult, error) {
 
-	rows, err := m.db.Query("SELECT key, value FROM settings WHERE type=?", t)
+	rows, err := m.db.Query("SELECT `key`, `value` FROM settings WHERE type=?", t)
 	if err != nil {
 		return nil, err
 	}
