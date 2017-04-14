@@ -12,28 +12,6 @@ const (
 	DATEFORMAT = "1/2/2006 3:04:05.000pm (MST)"
 )
 
-// type Time struct {
-// 	time.Time
-// }
-
-// func (t *Time) SetBSON(raw bson.Raw) error {
-// 	i := int64(binary.LittleEndian.Uint64(raw.Data))
-// 	if i == -62135596800000 {
-// 		t.Time = time.Time{} // In UTC for convenience.
-// 	} else {
-// 		t.Time = time.Unix(i/1e3, i%1e3*1e6)
-// 	}
-// 	return nil
-// }
-
-// func (t Time) MarshalText() ([]byte, error) {
-// 	return []byte(t.Format(DATEFORMAT)), nil
-// }
-
-// func (t Time) MarshalJSON() ([]byte, error) {
-// 	return []byte(`"` + t.Format(DATEFORMAT) + `"`), nil
-// }
-
 type DbObject struct {
 	Datetime        time.Time
 	MicroSeconds    int
@@ -86,10 +64,6 @@ type SettingObject struct {
 
 type SettingResult []SettingObject
 
-// func init() {
-// 	dbConnectString = flag.String("db", "localhost", "Database Connection String")
-// }
-
 func (slice DbResult) Len() int {
 	return len(slice)
 }
@@ -115,12 +89,14 @@ type Filter struct {
 	EndDate   string
 	Equals    map[string]interface{}
 	Like      map[string]string
+	Or        map[string]string
 }
 
 func NewFilter() Filter {
 	filter := Filter{}
 	filter.Equals = make(map[string]interface{})
 	filter.Like = make(map[string]string)
+	filter.Or = make(map[string]string)
 	return filter
 }
 
@@ -176,13 +152,3 @@ func (d *DbObject) Save() error {
 	}
 	return nil
 }
-
-// func (d DbObject) MarshalJSON() ([]byte, error) {
-// 	return json.Marshal(struct {
-// 		DbObject
-// 		Datetime string
-// 	}{
-// 		DbObject: d,
-// 		Datetime: d.Datetime.Format(DATEFORMAT),
-// 	})
-// }

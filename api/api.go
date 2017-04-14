@@ -8,6 +8,8 @@ import (
 	"sort"
 	"strconv"
 
+	"time"
+
 	"github.com/goji/param"
 	"github.com/gorilla/websocket"
 	"github.com/weave-lab/flanders/capture"
@@ -26,7 +28,6 @@ var upgrader = websocket.Upgrader{
 }
 
 func StartWebServer(address string, assetfolder string) error {
-
 	goji.Use(CORS)
 
 	goji.Get("/search", func(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -34,28 +35,39 @@ func StartWebServer(address string, assetfolder string) error {
 		options := &db.Options{}
 
 		r.ParseForm()
-		startDate := r.Form.Get("startDate")
-		endDate := r.Form.Get("endDate")
-		limit := r.Form.Get("limit")
-		touser := r.Form.Get("touser")
-		fromuser := r.Form.Get("fromuser")
-		sourceip := r.Form.Get("sourceip")
-		destip := r.Form.Get("destip")
+		form := sanatizedForm(r.Form)
+		startDate := form.Get("startdate")
+		endDate := form.Get("enddate")
+		limit := form.Get("limit")
+		touser := form.Get("touser")
+		fromuser := form.Get("fromuser")
+		sourceip := form.Get("sourceip")
+		destip := form.Get("destip")
 
 		if startDate != "" {
-			filter.StartDate = startDate
+			d, err := time.Parse(requestDateFormat, startDate)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			filter.StartDate = d.Format(time.RFC3339)
 		}
 
 		if endDate != "" {
-			filter.EndDate = endDate
+			d, err := time.Parse(requestDateFormat, endDate)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			filter.EndDate = d.Format(time.RFC3339)
 		}
 
 		if touser != "" {
-			filter.Equals["touser"] = touser
+			filter.Like["touser"] = touser
 		}
 
 		if fromuser != "" {
-			filter.Equals["fromuser"] = fromuser
+			filter.Like["fromuser"] = fromuser
 		}
 
 		if sourceip != "" {
@@ -77,19 +89,18 @@ func StartWebServer(address string, assetfolder string) error {
 			}
 		}
 
-/*		order := r.Form["orderby"]
+		order := form["orderby"]
 		if len(order) == 0 {
 			options.Sort = append(options.Sort, "-datetime")
 		} else {
 			options.Sort = order
-		}*/
+		}
 
 		results, err := db.Db.Find(&filter, options)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		//fmt.Print(results)
 		jsonResults, err := json.Marshal(results)
 		if err != nil {
 			fmt.Fprint(w, err)
@@ -101,19 +112,19 @@ func StartWebServer(address string, assetfolder string) error {
 
 	goji.Get("/call/:id", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		callID := c.URLParams["id"]
-
+		// Get all calls & call legs initiated from callID
 		dbResults, err := packetsByCallID(callID, "")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
+		// Grab the first db result and
+		// any that are != to the one before it
 		sort.Sort(dbResults)
-
 		var results db.DbResult
-
-		for key, val := range dbResults {
-			if key == 0 || val != dbResults[key-1] {
+		for i, val := range dbResults {
+			if i == 0 || val != dbResults[i-1] {
 				results = append(results, val)
 			}
 		}
@@ -168,7 +179,8 @@ func StartWebServer(address string, assetfolder string) error {
 
 	goji.Get("/ws", func(c web.C, w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
-		filter := r.Form.Get("filter")
+		form := sanatizedForm(r.Form)
+		filter := form.Get("filter")
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -290,16 +302,9 @@ func packetsByCallID(callID string, excludeCallID string) (db.DbResult, error) {
 	var results db.DbResult
 	filter := db.NewFilter()
 	options := &db.Options{}
-	callIdMap := make(map[string]interface{})
-	callIdALegMap := make(map[string]interface{})
 
-	callIdMap["callid"] = callID
-	callIdALegMap["callidaleg"] = callID
-
-	filter.Equals["$or"] = []interface{}{
-		callIdMap,
-		callIdALegMap,
-	}
+	filter.Or["callid"] = callID
+	filter.Or["callidaleg"] = callID
 
 	options.Sort = append(options.Sort, "datetime")
 	options.Sort = append(options.Sort, "microseconds")
@@ -307,43 +312,31 @@ func packetsByCallID(callID string, excludeCallID string) (db.DbResult, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Get all the call IDs of call legs started by the initial callID
+	altCallIds := callLegIDs(excludeCallID, callID, results)
 
-	altCallIds := make(map[string]bool)
-	for _, msg := range results {
-		if excludeCallID != "" && msg.CallIdAleg == excludeCallID {
-			continue
-		}
-		if msg.CallId != callID {
-			_, ok := altCallIds[msg.CallId]
-			if !ok {
-				altCallIds[msg.CallId] = true
-			}
-		}
-	}
-	for newCallID, _ := range altCallIds {
+	// Recurse this method for each new call leg
+	for _, newCallID := range altCallIds {
 		p, err := packetsByCallID(newCallID, callID)
 		if err != nil {
 			return nil, err
 		}
-
 		results = append(results, p...)
 	}
 
 	return results, nil
 }
 
-func CORS(h http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
-		w.Header().Set("Access-Control-Allow-Methods", "POST,PUT,GET,HEAD,DELETE,OPTIONS")
-		w.Header().Set("Access-Control-Max-Age", "1728000")
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
+func callLegIDs(excludeCallID, trunkCallID string, results db.DbResult) []string {
+	callIds := []string{}
+	for _, msg := range results {
+		if excludeCallID != "" && msg.CallIdAleg == excludeCallID {
+			continue
 		}
-
-		h.ServeHTTP(w, r)
+		if msg.CallId != trunkCallID {
+			callIds = append(callIds, msg.CallId)
+		}
 	}
-	return http.HandlerFunc(fn)
+	callIds = UniqueSlice(callIds)
+	return callIds
 }
