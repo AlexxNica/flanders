@@ -9,7 +9,7 @@ import (
 	"github.com/weave-lab/flanders/log"
 )
 
-func processPacket(packet []byte) error {
+func processPacket(packet []byte, generatedTime time.Time) error {
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -60,11 +60,12 @@ func processPacket(packet []byte) error {
 	if hepMsg.Timestamp != 0 {
 		datetime = time.Unix(int64(hepMsg.Timestamp), int64(hepMsg.TimestampMicro)*1000)
 	} else {
-		datetime = time.Now()
+		datetime = generatedTime
 	}
 
 	dbObject := db.NewDbObject()
 
+	dbObject.GeneratedAt = generatedTime
 	dbObject.Datetime = datetime
 	dbObject.MicroSeconds = datetime.Nanosecond() / 1000
 	dbObject.Method = hepMsg.SipMsg.StartLine.Method + hepMsg.SipMsg.StartLine.Resp

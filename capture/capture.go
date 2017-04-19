@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/weave-lab/flanders/db"
 	"github.com/weave-lab/flanders/log"
@@ -44,12 +45,12 @@ func StartSIPCaptureServer(address string) error {
 			}
 
 			packet = packet[:length]
-			go func() {
-				err = processPacket(packet)
+			go func(generatedTime time.Time) {
+				err = processPacket(packet, generatedTime)
 				if err != nil {
 					log.Err(fmt.Sprintf("Unable to process packet: %s", err))
 				}
-			}()
+			}(time.Now())
 		}
 
 		conn.Close()

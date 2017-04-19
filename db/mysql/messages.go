@@ -10,7 +10,7 @@ import (
 func (m *MySQL) prepareInsertQuery() error {
 
 	q := `INSERT INTO messages (
-			date, micro_ts,
+			generated_at, date, micro_ts,
 			method, reply_reason, ruri,
   			ruri_user, ruri_domain,
   			from_user, from_domain, from_tag,
@@ -31,7 +31,8 @@ func (m *MySQL) prepareInsertQuery() error {
 	VALUES(?,?,?,?,?,?,?,?,?,?,
 		   ?,?,?,?,?,?,?,?,?,?,
 		   ?,?,?,?,?,?,?,?,?,?,
-		   ?,?,?,?,?,?,?,?,?,?
+		   ?,?,?,?,?,?,?,?,?,?,
+		   ?
 		   )`
 
 	i, err := m.db.Prepare(q)
@@ -48,6 +49,7 @@ func (m *MySQL) prepareInsertQuery() error {
 func (m *MySQL) Insert(d *db.DbObject) error {
 
 	_, err := m.insert.Exec(
+		d.GeneratedAt,
 		d.Datetime, d.MicroSeconds,
 		d.Method, d.ReplyReason, d.Ruri,
 		d.RuriUser, d.RuriDomain,
@@ -75,7 +77,7 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 
 var (
 	columns = []string{
-		`date`, `micro_ts`, `method`, `reply_reason`, `ruri`, `ruri_user`, `ruri_domain`,
+		`generated_at`, `date`, `micro_ts`, `method`, `reply_reason`, `ruri`, `ruri_user`, `ruri_domain`,
 		`from_user`, `from_domain`, `from_tag`, `to_user`, `to_domain`, `to_tag`, `pid_user`,
 		`contact_user`, `auth_user`, `callid`, `callid_aleg`, `via_1`, `via_1_branch`, `cseq`,
 		`diversion`, `reason`, `content_type`, `auth`, `user_agent`, `source_ip`, `source_port`,
@@ -92,7 +94,7 @@ var (
 	}
 
 	orderMap = map[string]string{
-		"datetime":     "date",
+		"datetime":     "generated_at",
 		"microseconds": "micro_ts",
 	}
 )
@@ -186,8 +188,8 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 		order += comma + s + dir
 	}
 
-	q := fmt.Sprintf(`SELECT %s 
-					  FROM messages 
+	q := fmt.Sprintf(`SELECT %s
+					  FROM messages
 					  %s
 					  %s
 					  LIMIT %d`, strings.Join(columns, ","), where, order, limit)
@@ -205,6 +207,7 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 	for rows.Next() {
 		var d db.DbObject
 		err = rows.Scan(
+			&d.GeneratedAt,
 			&d.Datetime, &d.MicroSeconds,
 			&d.Method, &d.ReplyReason, &d.Ruri,
 			&d.RuriUser, &d.RuriDomain,
