@@ -44,12 +44,12 @@ func StartSIPCaptureServer(address string) error {
 			}
 
 			packet = packet[:length]
-
-			err = processPacket(packet)
-			if err != nil {
-				log.Err(fmt.Sprintf("Unable to process packet: %s", err))
-				continue
-			}
+			go func() {
+				err = processPacket(packet)
+				if err != nil {
+					log.Err(fmt.Sprintf("Unable to process packet: %s", err))
+				}
+			}()
 		}
 
 		conn.Close()
