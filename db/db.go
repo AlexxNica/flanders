@@ -13,6 +13,7 @@ const (
 )
 
 type DbObject struct {
+	GeneratedAt     time.Time
 	Datetime        time.Time
 	MicroSeconds    int
 	Method          string

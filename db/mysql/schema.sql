@@ -6,6 +6,7 @@ USE sipcapture;
 
 CREATE TABLE IF NOT EXISTS `messages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `generated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `micro_ts` bigint(18) NOT NULL DEFAULT '0',
   `method` varchar(50) NOT NULL DEFAULT '',
