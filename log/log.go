@@ -44,7 +44,7 @@ func init() {
 	case "linux", "darwin":
 		err := setupDefaultLogger()
 		if err != nil {
-			panic("Cannot setup the default logger to syslog")
+			fmt.Println("Cannot setup the default logger to syslog")
 		}
 	}
 }
