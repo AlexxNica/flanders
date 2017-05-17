@@ -24,6 +24,7 @@ func init() {
 
 func (m *MySQL) Connect(connectString string) error {
 	connection, err := sql.Open("mysql", connectString)
+	connection.SetMaxOpenConns(10)
 	if err != nil {
 		return err
 	}
