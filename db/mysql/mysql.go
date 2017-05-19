@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"flag"
 	"fmt"
 	"strings"
 	"time"
@@ -9,6 +10,17 @@ import (
 	_ "github.com/go-sql-driver/mysql" // Loading mysql driver for this database connection
 	"github.com/weave-lab/flanders/db"
 )
+
+var maxConnections *int
+var batchInsert *bool
+var batchAmount *int
+
+func init() {
+	// Add mysql specific flag settings
+	maxConnections = flag.Int("mysql-max-connections", 30, "Max connections for mysql")
+	batchInsert = flag.Bool("mysql-batch", true, "Use batch inserting for high traffic systems")
+	batchAmount = flag.Int("mysql-batch-count", 100, "Amount of messages to batch at one time")
+}
 
 type MySQL struct {
 	db *sql.DB
@@ -22,9 +34,10 @@ func init() {
 	db.RegisterHandler("mysql", &m)
 }
 
+// Connect connects to the database... go figure
 func (m *MySQL) Connect(connectString string) error {
 	connection, err := sql.Open("mysql", connectString)
-	connection.SetMaxOpenConns(10)
+	connection.SetMaxOpenConns(*maxConnections)
 	if err != nil {
 		return err
 	}

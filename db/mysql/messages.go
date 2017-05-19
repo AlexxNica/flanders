@@ -3,9 +3,13 @@ package mysql
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/weave-lab/flanders/db"
 )
+
+var batch []*db.DbObject
+var lock sync.Mutex
 
 func (m *MySQL) prepareInsertQuery() error {
 
@@ -35,6 +39,17 @@ func (m *MySQL) prepareInsertQuery() error {
 		   ?
 		   )`
 
+	if *batchInsert {
+		for i := 1; i < *batchAmount; i++ {
+			q += `,(?,?,?,?,?,?,?,?,?,?,
+    		   ?,?,?,?,?,?,?,?,?,?,
+    		   ?,?,?,?,?,?,?,?,?,?,
+    		   ?,?,?,?,?,?,?,?,?,?,
+    		   ?
+    		   )`
+		}
+	}
+
 	i, err := m.db.Prepare(q)
 	if err != nil {
 		return err
@@ -47,6 +62,19 @@ func (m *MySQL) prepareInsertQuery() error {
 
 // Insert adds a new record to the messages table in mysql
 func (m *MySQL) Insert(d *db.DbObject) error {
+
+	if *batchInsert {
+		lock.Lock()
+		batch = append(batch, d)
+		if len(batch) == *batchAmount {
+			batchForInsert := batch
+			batch = nil
+			lock.Unlock()
+			return m.InsertBatch(batchForInsert)
+		}
+		lock.Unlock()
+		return nil
+	}
 
 	_, err := m.insert.Exec(
 		d.GeneratedAt,
@@ -71,8 +99,42 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
+
+}
+
+// InsertBatch inserts a group of sip messages
+func (m *MySQL) InsertBatch(b []*db.DbObject) error {
+	var hugeInsertSlice []interface{}
+
+	for _, d := range b {
+		tempSlice := []interface{}{
+			d.GeneratedAt, d.Datetime, d.MicroSeconds,
+			d.Method, d.ReplyReason, d.Ruri,
+			d.RuriUser, d.RuriDomain,
+			d.FromUser, d.FromDomain, d.FromTag,
+			d.ToUser, d.ToDomain, d.ToTag,
+			d.PidUser, d.ContactUser, d.AuthUser,
+			d.CallId, d.CallIdAleg,
+			d.Via, d.ViaBranch,
+			d.Cseq, d.Diversion,
+			d.Reason, d.ContentType,
+			d.Auth, d.UserAgent,
+			d.SourceIp, d.SourcePort,
+			d.DestinationIp, d.DestinationPort,
+			d.ContactIp, d.ContactPort,
+			d.OriginatorIp, d.OriginatorPort,
+			d.Proto, d.Family, d.RtpStat,
+			d.Type, d.Node, d.Msg,
+		}
+
+		hugeInsertSlice = append(hugeInsertSlice, tempSlice...)
+
+	}
+
+	_, err := m.insert.Exec(hugeInsertSlice...)
+
+	return err
 }
 
 var (
