@@ -102,9 +102,10 @@ func NewFilter() Filter {
 }
 
 type Options struct {
-	Sort     []string
-	Limit    int
-	Distinct string
+	Sort         []string
+	Limit        int
+	Distinct     string
+	UniqueCallID bool
 }
 
 type DbHandler interface {

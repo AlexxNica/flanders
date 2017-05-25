@@ -96,6 +96,8 @@ func StartWebServer(address string, assetfolder string) error {
 			options.Sort = order
 		}
 
+		options.UniqueCallID = true
+
 		results, err := db.Db.Find(&filter, options)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

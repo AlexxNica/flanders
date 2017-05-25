@@ -156,7 +156,7 @@ var (
 	}
 
 	orderMap = map[string]string{
-		"datetime":     "generated_at",
+		"datetime":     "date",
 		"microseconds": "micro_ts",
 	}
 )
@@ -249,14 +249,20 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 		}
 		order += comma + s + dir
 	}
-
 	q := fmt.Sprintf(`SELECT %s
 					  FROM messages
 					  %s
 					  %s
 					  LIMIT %d`, strings.Join(columns, ","), where, order, limit)
 
+	if options.UniqueCallID {
+		// Wrap query in another query to group by call ID instead of returning
+		// every packet. We just want individual calls
+		q = fmt.Sprintf(`SELECT * FROM (%s) x GROUP BY x.callid`, q)
+	}
+
 	fmt.Println(q)
+
 	rows, err := m.db.Query(q, values...)
 	if err != nil {
 		fmt.Println(q)
