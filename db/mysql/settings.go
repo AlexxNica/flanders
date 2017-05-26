@@ -1,6 +1,10 @@
 package mysql
 
-import "github.com/weave-lab/flanders/db"
+import (
+	"fmt"
+
+	"github.com/weave-lab/flanders/db"
+)
 
 func (m *MySQL) GetSettings(t string) (db.SettingResult, error) {
 
@@ -29,13 +33,14 @@ func (m *MySQL) GetSettings(t string) (db.SettingResult, error) {
 func (m *MySQL) SetSetting(t string, s db.SettingObject) error {
 
 	// if there is an error, we won't do anything with it
-	_ = m.DeleteSetting(t, s.Key)
+	//_ = m.DeleteSetting(t, s.Key)
 
-	_, err := m.db.Exec(`INSERT INTO settings (type, key, value)
-							VALUES (?, ?, ?)
-						ON DUPLICATE KEY UPDATE value value=?
-						`, t, s.Key, s.Val, s.Val)
+	_, err := m.db.Exec(`INSERT INTO settings 
+		(settings.type, settings.key, settings.value) 
+		VALUES (?, ?, ?) 
+		ON DUPLICATE KEY UPDATE value=?`, t, s.Key, s.Val, s.Val)
 	if err != nil {
+		fmt.Print(err)
 		return err
 	}
 
@@ -44,7 +49,7 @@ func (m *MySQL) SetSetting(t string, s db.SettingObject) error {
 
 func (m *MySQL) DeleteSetting(t string, k string) error {
 
-	_, err := m.db.Exec("DELETE FROM settings WHERE type=? and key=?", t, k)
+	_, err := m.db.Exec("DELETE FROM settings WHERE `type`=? and `key`=?", t, k)
 	if err != nil {
 		return err
 	}
