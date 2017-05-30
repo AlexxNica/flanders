@@ -1,7 +1,10 @@
 package mysql
 
 import (
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"sync"
 
@@ -76,6 +79,12 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 		return nil
 	}
 
+	//gzip full packet
+	var gzMsg bytes.Buffer
+	w := gzip.NewWriter(&gzMsg)
+	w.Write([]byte(d.Msg))
+	w.Close()
+
 	_, err := m.insert.Exec(
 		d.GeneratedAt,
 		d.Datetime, d.MicroSeconds,
@@ -94,7 +103,7 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 		d.ContactIp, d.ContactPort,
 		d.OriginatorIp, d.OriginatorPort,
 		d.Proto, d.Family, d.RtpStat,
-		d.Type, d.Node, d.Msg,
+		d.Type, d.Node, gzMsg.String(),
 	)
 	if err != nil {
 		return err
@@ -108,6 +117,11 @@ func (m *MySQL) InsertBatch(b []*db.DbObject) error {
 	var hugeInsertSlice []interface{}
 
 	for _, d := range b {
+		//gzip full packet
+		var gzMsg bytes.Buffer
+		w := gzip.NewWriter(&gzMsg)
+		w.Write([]byte(d.Msg))
+		w.Close()
 		tempSlice := []interface{}{
 			d.GeneratedAt, d.Datetime, d.MicroSeconds,
 			d.Method, d.ReplyReason, d.Ruri,
@@ -125,7 +139,7 @@ func (m *MySQL) InsertBatch(b []*db.DbObject) error {
 			d.ContactIp, d.ContactPort,
 			d.OriginatorIp, d.OriginatorPort,
 			d.Proto, d.Family, d.RtpStat,
-			d.Type, d.Node, d.Msg,
+			d.Type, d.Node, gzMsg.String(),
 		}
 
 		hugeInsertSlice = append(hugeInsertSlice, tempSlice...)
@@ -297,6 +311,17 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 		if err != nil {
 			return nil, err
 		}
+
+		r, err := gzip.NewReader(strings.NewReader(d.Msg))
+		if err != nil {
+			return nil, err
+		}
+		uzipMsg, err := ioutil.ReadAll(r)
+		r.Close()
+		if err != nil {
+			return nil, err
+		}
+		d.Msg = string(uzipMsg)
 
 		results = append(results, d)
 	}
