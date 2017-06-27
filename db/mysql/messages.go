@@ -314,14 +314,18 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 
 		r, err := gzip.NewReader(strings.NewReader(d.Msg))
 		if err != nil {
-			return nil, err
+			//return nil, err
+			//fmt.Println(err)
+		} else {
+			uzipMsg, err := ioutil.ReadAll(r)
+			r.Close()
+			if err != nil {
+				//fmt.Println(err)
+				//return nil, err
+			} else {
+				d.Msg = string(uzipMsg)
+			}
 		}
-		uzipMsg, err := ioutil.ReadAll(r)
-		r.Close()
-		if err != nil {
-			return nil, err
-		}
-		d.Msg = string(uzipMsg)
 
 		results = append(results, d)
 	}
