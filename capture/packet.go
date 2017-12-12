@@ -9,8 +9,24 @@ import (
 	"github.com/weave-lab/flanders/log"
 )
 
-func processPacket(packet []byte, generatedTime time.Time) error {
+type packetProcessor struct {
+	process chan []byte
+	quit    chan bool
+}
 
+func (p *packetProcessor) run() {
+hubforloop:
+	for {
+		select {
+		case packet := <-p.process:
+			processPacket(packet, time.Now())
+		case <-p.quit:
+			break hubforloop
+		}
+	}
+}
+
+func processPacket(packet []byte, generatedTime time.Time) error {
 	defer func() {
 		if r := recover(); r != nil {
 			log.Err("Sip parser panicked, but I recovered...")
@@ -25,7 +41,6 @@ func processPacket(packet []byte, generatedTime time.Time) error {
 		log.Err(string(packet))
 		return fmt.Errorf("Unable to parse packet: %s", err)
 	}
-
 	if hepMsg.SipMsg == nil || hepMsg.SipMsg.StartLine == nil {
 		return nil
 	}
