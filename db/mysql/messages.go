@@ -6,41 +6,40 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
-	"sync"
 
 	"github.com/weave-lab/flanders/db"
 )
 
-var batch []*db.DbObject
-var lock sync.Mutex
-
-func (m *MySQL) prepareInsertQuery() error {
-
-	q := `INSERT INTO messages (
+var (
+	insertStatement = `INSERT INTO messages (
 			generated_at, date, micro_ts,
 			method, reply_reason, ruri,
-  			ruri_user, ruri_domain,
-  			from_user, from_domain, from_tag,
-  			to_user, to_domain, to_tag,
-  			pid_user, contact_user, auth_user,
-  			callid, callid_aleg,
-  			via_1, via_1_branch,
-  			cseq, diversion,
-  			reason, content_type,
-  			auth, user_agent,
+			ruri_user, ruri_domain,
+			from_user, from_domain, from_tag,
+			to_user, to_domain, to_tag,
+			pid_user, contact_user, auth_user,
+			callid, callid_aleg,
+			via_1, via_1_branch,
+			cseq, diversion,
+			reason, content_type,
+			auth, user_agent,
 			source_ip, source_port,
-  			destination_ip, destination_port,
-  			contact_ip, contact_port,
-  			originator_ip, originator_port,
-  			proto, family, rtp_stat,
-  			type, node, msg
+			destination_ip, destination_port,
+			contact_ip, contact_port,
+			originator_ip, originator_port,
+			proto, family, rtp_stat,
+			type, node, msg
 		)
 	VALUES(?,?,?,?,?,?,?,?,?,?,
-		   ?,?,?,?,?,?,?,?,?,?,
-		   ?,?,?,?,?,?,?,?,?,?,
-		   ?,?,?,?,?,?,?,?,?,?,
-		   ?
-		   )`
+			?,?,?,?,?,?,?,?,?,?,
+			?,?,?,?,?,?,?,?,?,?,
+			?,?,?,?,?,?,?,?,?,?,
+			?
+			)`
+)
+
+func (m *MySQL) prepareInsertQuery() error {
+	q := insertStatement
 
 	if *batchInsert {
 		for i := 1; i < *batchAmount; i++ {
@@ -64,19 +63,15 @@ func (m *MySQL) prepareInsertQuery() error {
 }
 
 // Insert adds a new record to the messages table in mysql
-func (m *MySQL) Insert(d *db.DbObject) error {
-
+func (m *MySQL) Insert(d db.DbObject) error {
 	if *batchInsert {
-		lock.Lock()
-		batch = append(batch, d)
-		if len(batch) == *batchAmount {
-			batchForInsert := batch
-			batch = nil
-			lock.Unlock()
-			return m.InsertBatch(batchForInsert)
+		m.batch.Lock()
+		defer m.batch.Unlock()
+		m.batch.rows = append(m.batch.rows, d)
+		if len(m.batch.rows) < m.batch.maxRows {
+			return nil
 		}
-		lock.Unlock()
-		return nil
+		return m.processBatch(m.batch.rows)
 	}
 
 	//gzip full packet
@@ -110,45 +105,6 @@ func (m *MySQL) Insert(d *db.DbObject) error {
 	}
 	return nil
 
-}
-
-// InsertBatch inserts a group of sip messages
-func (m *MySQL) InsertBatch(b []*db.DbObject) error {
-	var hugeInsertSlice []interface{}
-
-	for _, d := range b {
-		//gzip full packet
-		var gzMsg bytes.Buffer
-		w := gzip.NewWriter(&gzMsg)
-		w.Write([]byte(d.Msg))
-		w.Close()
-		tempSlice := []interface{}{
-			d.GeneratedAt, d.Datetime, d.MicroSeconds,
-			d.Method, d.ReplyReason, d.Ruri,
-			d.RuriUser, d.RuriDomain,
-			d.FromUser, d.FromDomain, d.FromTag,
-			d.ToUser, d.ToDomain, d.ToTag,
-			d.PidUser, d.ContactUser, d.AuthUser,
-			d.CallId, d.CallIdAleg,
-			d.Via, d.ViaBranch,
-			d.Cseq, d.Diversion,
-			d.Reason, d.ContentType,
-			d.Auth, d.UserAgent,
-			d.SourceIp, d.SourcePort,
-			d.DestinationIp, d.DestinationPort,
-			d.ContactIp, d.ContactPort,
-			d.OriginatorIp, d.OriginatorPort,
-			d.Proto, d.Family, d.RtpStat,
-			d.Type, d.Node, gzMsg.String(),
-		}
-
-		hugeInsertSlice = append(hugeInsertSlice, tempSlice...)
-
-	}
-
-	_, err := m.insert.Exec(hugeInsertSlice...)
-
-	return err
 }
 
 var (

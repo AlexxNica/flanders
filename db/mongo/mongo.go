@@ -36,7 +36,7 @@ func (m *MongoDb) Connect(connectString string) error {
 	return nil
 }
 
-func (m *MongoDb) Insert(dbObject *db.DbObject) error {
+func (m *MongoDb) Insert(dbObject db.DbObject) error {
 	collection := m.connection.DB(DB_NAME).C("message")
 	err := collection.Insert(dbObject)
 	return err

@@ -1,11 +1,9 @@
 package capture
 
 import (
-	"fmt"
 	"net"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/weave-lab/flanders/db"
 	"github.com/weave-lab/flanders/log"
@@ -18,16 +16,21 @@ var h = ListenerHub{
 	connections: make(map[*Listener]bool),
 }
 
+var p = packetProcessor{
+	process: make(chan []byte),
+}
+
 func StartSIPCaptureServer(address string) error {
 
 	go h.run()
+	go p.run()
 
 	addr, err := net.ResolveUDPAddr("udp", address)
 	if err != nil {
 		return err
 	}
 
-	log.Info("Flanders server listening on " + addr.String())
+	log.Info("flanders server listening on " + addr.String())
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
 		log.Crit(err.Error())
@@ -37,22 +40,13 @@ func StartSIPCaptureServer(address string) error {
 	go func() {
 		for {
 			packet := make([]byte, 4096)
-
 			length, _, err := conn.ReadFromUDP(packet)
 			if err != nil {
 				log.Err(err.Error())
 				continue
 			}
-
-			packet = packet[:length]
-			go func(generatedTime time.Time) {
-				err = processPacket(packet, generatedTime)
-				if err != nil {
-					log.Err(fmt.Sprintf("Unable to process packet: %s", err))
-				}
-			}(time.Now())
+			p.process <- packet[:length]
 		}
-
 		conn.Close()
 
 	}()

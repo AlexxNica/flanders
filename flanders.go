@@ -27,6 +27,7 @@ func main() {
 	flag.Parse()
 	//log.SetLogger(os.Stdout)
 	log.SetLogLevel(*loglevel)
+	log.Debug("debug enabled")
 
 	webAddress := "0.0.0.0:" + *webPort
 	sipAddress := "0.0.0.0:" + *sipPort

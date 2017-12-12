@@ -110,7 +110,7 @@ type Options struct {
 
 type DbHandler interface {
 	Connect(connectString string) error
-	Insert(dbObject *DbObject) error
+	Insert(dbObject DbObject) error
 	Find(filter *Filter, options *Options) (DbResult, error)
 	CheckSchema() error // Check to see if the database has been setup or not. Returns nil if all is well
 	SetupSchema() error // Sets up the database schema. This will delete all data!!!
@@ -148,7 +148,7 @@ func NewDbObject() *DbObject {
 }
 
 func (d *DbObject) Save() error {
-	err := Db.Insert(d)
+	err := Db.Insert(*d)
 	if err != nil {
 		return err
 	}
