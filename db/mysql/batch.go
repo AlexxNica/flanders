@@ -21,6 +21,10 @@ type batch struct {
 func (m *MySQL) processBatch(rows []db.DbObject) error {
 	m.batch.Lock()
 	defer m.batch.Unlock()
+	if len(rows) == 0 {
+		log.Debug("ignoring batch with 0 rows")
+		return nil
+	}
 	m.batch.rows = []db.DbObject{} // reset batch
 	go func() {
 		err := m.insertBatch(rows)
@@ -34,7 +38,6 @@ func (m *MySQL) processBatch(rows []db.DbObject) error {
 
 // insertBatch inserts a group of sip messages
 func (m *MySQL) insertBatch(rows []db.DbObject) error {
-	log.Debug(fmt.Sprintf("inserting batch of rows [%d]", len(rows)))
 	var hugeInsertSlice []interface{}
 
 	for _, d := range rows {
@@ -66,7 +69,7 @@ func (m *MySQL) insertBatch(rows []db.DbObject) error {
 		hugeInsertSlice = append(hugeInsertSlice, tempSlice...)
 
 	}
-	_, err := m.insert.Exec(hugeInsertSlice...)
+	_, err := m.insert[time.Now().Format("01_02_2006")].Exec(hugeInsertSlice...)
 
 	return err
 }

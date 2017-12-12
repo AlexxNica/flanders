@@ -25,7 +25,7 @@ func main() {
 
 	loglevel := flag.String("loglevel", "warn", "Log level")
 	flag.Parse()
-	//log.SetLogger(os.Stdout)
+	log.SetLogger(os.Stdout)
 	log.SetLogLevel(*loglevel)
 	log.Debug("debug enabled")
 
