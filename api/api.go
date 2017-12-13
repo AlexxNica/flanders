@@ -300,6 +300,7 @@ func StartWebServer(address string, assetfolder string) error {
 	return nil
 }
 
+// TODO: have api pass date
 func packetsByCallID(callID string, excludeCallID string) (db.DbResult, error) {
 	var results db.DbResult
 	filter := db.NewFilter()

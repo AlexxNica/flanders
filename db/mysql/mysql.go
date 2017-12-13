@@ -134,11 +134,11 @@ func (m *MySQL) runBatch() error {
 				return nil
 			}
 			log.Info(fmt.Sprintf("sending final batch of rows [%d]", len(m.batch.rows)))
-			return m.processBatch(m.batch.rows)
+			return m.processBatchOnTimer(m.batch.rows)
 		case <-t.C:
 			// call send if it has been > sendFrequency since last send
 			if m.batch.lastSent.Add(sendFrequency).Before(time.Now()) {
-				err := m.processBatch(m.batch.rows)
+				err := m.processBatchOnTimer(m.batch.rows)
 				if err != nil {
 					log.Crit(fmt.Sprintf("could not process batch [%s]", err.Error()))
 				}
