@@ -117,10 +117,16 @@ func (m *MySQL) Find(filter *db.Filter, options *db.Options) (db.DbResult, error
 	if startDate.IsZero() && endDate.IsZero() { // only use today
 		tables = append(tables, fmt.Sprintf("%s_%s", tablePrefix, time.Now().Format("01_02_2006")))
 	} else if !startDate.IsZero() && !endDate.IsZero() && endDate.After(startDate) {
+		c := 0
 		for d := startDate; !d.Equal(endDate.AddDate(0, 0, 1)); d = d.AddDate(0, 0, 1) {
 			date := d.Format("01_02_2006")
 			log.Debug(fmt.Sprintf("adding date [%s]", date))
 			tables = append(tables, fmt.Sprintf("%s_%s", tablePrefix, date))
+			if c > 30 {
+				log.Crit(fmt.Sprintf("too many days selected: start [%+v] - end [%+v]", startDate, endDate))
+				break
+			}
+			c = c + 1
 		}
 	} else if !startDate.IsZero() {
 		date := startDate.Format("01_02_2006")
